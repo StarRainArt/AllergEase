@@ -1,1 +1,1 @@
-# Recepten_mobileApp
+# AllergEase
