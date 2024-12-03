@@ -1,17 +1,18 @@
 import React from 'react';
-import { Button, Text, View, StyleSheet, Pressable } from 'react-native';
+import { Button, Text, ScrollView, View, StyleSheet, Pressable, Dimensions } from 'react-native';
 
 
+const { width: screenWidth } = Dimensions.get('window');
 
 const FridgePage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text>Your fridge</Text>
-      <View>
+      <ScrollView>
         <View style={styles.fridgeItems}></View>
         <View style={styles.fridgeItems}></View>
         <View style={styles.fridgeItems}></View>
-      </View>
+      </ScrollView>
       <View style={styles.buttonItems}>
         <Pressable
           style={styles.buttonStyles}
@@ -42,23 +43,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8f8f8',
+    paddingTop: 40
   },
   fridgeItems: {
-    width: 100,
-    height: 100,
+    width: screenWidth * 0.9,
+    height: 250,
     backgroundColor: '#d3d3d3',
     marginBottom: 10,
   },
   buttonItems: {
-    marginTop: 20,
+    marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 10
   },
   buttonStyles: {
     justifyContent: 'center',
