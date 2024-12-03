@@ -1,11 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { Button, Text, View, StyleSheet, Pressable } from 'react-native';
-import ProfilePage from './loginpages/profiel';
 
-const Stack = createStackNavigator();
+
 
 const FridgePage = ({ navigation }) => {
   return (

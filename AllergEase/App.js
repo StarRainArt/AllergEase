@@ -43,7 +43,7 @@ export default function App() {
         <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />
 
         {/* Pages accessed from Profile */}
-        <Stack.Screen name="AddToFridge" component={AddToFridgePage} />
+        {/* <Stack.Screen name="AddToFridge" component={AddToFridgePage} /> */}
 
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
