@@ -2,22 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { View, Button, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFonts } from "expo-font";
 
 export default function ProfilePage({ navigation }) {
-    const [user, setUser] = useState(null);
+  const [fontsLoaded] = useFonts({
+    "Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
+    "DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
+    "DynaPuffMedium": require("../assets/fonts/DynaPuff-Medium.ttf"),
+    "BalooPaaji2": require("../assets/fonts/BalooPaaji2-VariableFont_wght.ttf"),
+  });
+
+  const [user, setUser] = useState(null);
     
-    useFocusEffect(
-        React.useCallback(() => {
-          const fetchUser = async () => {
-            const userData = await AsyncStorage.getItem('user');
-            setUser(userData ? JSON.parse(userData) : null);
-          };
-          fetchUser();
-        }, [])
-      );
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchUser = async () => {
+        const userData = await AsyncStorage.getItem('user');
+        setUser(userData ? JSON.parse(userData) : null);
+      };
+      fetchUser();
+    }, [])
+  );
   
     return (
       <View style={styles.background}>
+        <Text style={styles.title}>profiel </Text>
         {user && (
           <>
             <Text>Username: {user.username}</Text>
@@ -33,45 +42,15 @@ export default function ProfilePage({ navigation }) {
 
   const styles = StyleSheet.create({
     background: {
-        padding: 30,
+      padding: 30,
+      flex: 1,
+      alignItems: 'center',
+      backgroundColor: "#FFF5E1",
     },
-    container: {
-        flex: 1,
-    },
-    listContainer: {
-        paddingBottom: 100, // Space for the Save button
-    },
-    item: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-    },
-    text: {
-        fontSize: 16,
-    },
-    checkbox: {
-        width: 20,
-        height: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    uncheckedBox: {
-        width: 18,
-        height: 18,
-        borderWidth: 2,
-        borderColor: '#000',
-        backgroundColor: 'transparent',
-    },
-    checkedBox: {
-        width: 18,
-        height: 18,
-        backgroundColor: '#000',
-    },
-    buttonContainer: {
-        padding: 10,
-        backgroundColor: '#fff',
-    },
+    title: {
+      textAlign: "center",
+      fontSize: 40,
+      fontFamily: "DynaPuffMedium",
+      color: "#472D30"
+    }
 });
