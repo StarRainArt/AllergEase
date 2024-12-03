@@ -5,7 +5,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
 import RecipesPage from './recipes';
-import FridgePage from './fridge';
+import FridgePage from './fridgepages/fridge';
+import AddToFridgePage from './fridgepages/addtofridge';
 import ShoplistPage from './shoplist';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
@@ -40,6 +41,9 @@ export default function App() {
         {/* Pages accessed from Profile */}
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />
+
+        {/* Pages accessed from Profile */}
+        <Stack.Screen name="AddToFridge" component={AddToFridgePage} />
 
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
