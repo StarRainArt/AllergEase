@@ -1,17 +1,16 @@
 import React from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
-import { Recipe } from "./recipe";
 
-export default function recipeList({ recipes }) {
+export default function RecipeList({ recipes }) {
   return (
     <View style={styles.container}>
       <FlatList
         data={recipes}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        keyExtractor={(recipe) => recipe.id}
+        renderItem={({ recipe }) => (
           <View style={styles.recipe}>
-            <Text>{item.title}</Text>
-            <Text>{item.image}</Text>
+            <Text>{recipe.title}</Text>
+            <Text>{recipe.image}</Text>
           </View>
         )}
       />
