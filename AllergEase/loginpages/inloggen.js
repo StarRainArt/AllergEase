@@ -11,7 +11,7 @@ export default function LoginPage({ navigation }) {
       if (userData) {
         const user = JSON.parse(userData);
         if (user.email === email && user.password === password) {
-          navigation.navigate('Profile');
+            navigation.navigate('Main');
         } else {
           Alert.alert('Invalid credentials');
         }
