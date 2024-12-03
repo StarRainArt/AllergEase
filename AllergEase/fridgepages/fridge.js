@@ -28,7 +28,7 @@ const FridgePage = ({ navigation }) => {
         </Pressable>
         <Pressable
           style={styles.buttonStyles}
-          onPress={() => navigation.navigate('Add Ingredient')}
+          onPress={() => navigation.navigate('AddToFridgePage')}
         >
           <Text>Add Ingredient</Text>
         </Pressable>
