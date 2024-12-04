@@ -54,10 +54,6 @@ const FridgePage = ({ navigation }) => {
   );
 };
 
-
-
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -67,7 +63,7 @@ const styles = StyleSheet.create({
     paddingTop: 40
   },
   fridgeItems:{
-    
+
   },
   buttonItems: {
     marginTop: 10,
