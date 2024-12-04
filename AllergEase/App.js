@@ -5,8 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
 import RecipesPage from './recipes';
-import FridgePage from './fridgepages/fridge';
-import AddToFridgePage from './fridgepages/addtofridge';
+import FridgeStack from './fridgepages/FridgeStack';
 import ShoplistPage from './shoplist';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
@@ -23,7 +22,7 @@ function MainTabs() {
       }}
     >
       <Tab.Screen name="recipes" component={RecipesPage} />
-      <Tab.Screen name="fridge" component={FridgePage} />
+      <Tab.Screen name="fridge" component={FridgeStack} />
       <Tab.Screen name="shoplist" component={ShoplistPage} />
       <Tab.Screen name="Profile" component={ProfilePage} />
     </Tab.Navigator>
@@ -41,9 +40,6 @@ export default function App() {
         {/* Pages accessed from Profile */}
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />
-
-        {/* Pages accessed from Profile */}
-        <Stack.Screen name="AddToFridge" component={AddToFridgePage} />
 
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />

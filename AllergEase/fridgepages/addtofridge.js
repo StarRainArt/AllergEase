@@ -1,20 +1,47 @@
 import React, { useState } from 'react';
 import { Text, ScrollView, View, StyleSheet, Pressable, TextInput } from 'react-native';
 
-const AddToFridgePage = ({ navigation }) => {
+const AddToFridgePage = ({ navigation, route }) => {
   const [ingredientName, setIngredientName] = useState('');
+  const { addToFridge } = route.params;  // Access addToFridge function from params
 
-  // Handle text input changes
   const handleChangeText = (text) => {
     setIngredientName(text);
   };
 
-  // Handle form submission
-  const handleSubmit = () => {
-    if (ingredientName) {
-      console.log('Ingredient name submitted:', ingredientName);
-      // Handle submission logic, e.g., saving to a database or adding to a list
-      setIngredientName(''); // Clear input after submission
+  const fetchIngredients = async (ingredientName) => {
+    try {
+      const response = await fetch(
+        `https://api.spoonacular.com/food/ingredients/search?query=${ingredientName}&apiKey=bdab5cb788674ef286de1e7e6294097d`
+      );
+      const data = await response.json();
+      console.log('API Response:', data); // Log the full response
+      return data.results; // Return results (not ingredients)
+    } catch (error) {
+      console.error("Error fetching ingredients:", error);
+      return []; // Return an empty array if there's an error
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (ingredientName.trim()) {
+      const ingredients = await fetchIngredients(ingredientName);
+
+      // Filter the results to only get the exact match (case-insensitive)
+      const exactMatch = ingredients.filter(
+        (ingredient) =>
+          ingredient.name.toLowerCase() === ingredientName.toLowerCase()
+      );
+
+      console.log('Exact match ingredients:', exactMatch);  // Debugging step
+
+      if (exactMatch.length > 0) {
+        // Use the addToFridge function from route.params
+        addToFridge(exactMatch);  // This will call the function in FridgePage to update fridgeItems
+      } else {
+        console.log('No exact match ingredients found');
+      }
+      setIngredientName('');  // Reset the input field
     } else {
       console.log('Please enter a valid ingredient name');
     }
@@ -54,6 +81,7 @@ const AddToFridgePage = ({ navigation }) => {
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

@@ -1,18 +1,35 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Button, Text, ScrollView, View, StyleSheet, Pressable, Dimensions } from 'react-native';
-
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const FridgePage = ({ navigation }) => {
+  const [fridgeItems, setFridgeItems] = useState([]);
+  
+  useEffect(() => {
+    navigation.setOptions({
+      addToFridge: (items) => {
+        console.log('Adding to fridge:', items);  // Debugging step
+        setFridgeItems((prev) => [...prev, ...items]);
+      },
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <Text>Your fridge</Text>
       <ScrollView>
-        <View style={styles.fridgeItems}></View>
-        <View style={styles.fridgeItems}></View>
-        <View style={styles.fridgeItems}></View>
+        {fridgeItems.length > 0 ? (
+          fridgeItems.map((item, index) => (
+            <View key={index} style={styles.fridgeItems}>
+              <Text>{item.name}</Text>
+            </View>
+          ))
+        ) : (
+          <Text>No ingredients in your fridge.</Text>
+        )}
       </ScrollView>
+
       <View style={styles.buttonItems}>
         <Pressable
           style={styles.buttonStyles}
@@ -28,14 +45,18 @@ const FridgePage = ({ navigation }) => {
         </Pressable>
         <Pressable
           style={styles.buttonStyles}
-          onPress={() => navigation.navigate('AddToFridge')}>  {/* Use the correct name */}
+          onPress={() => navigation.navigate('AddToFridge', { addToFridge: setFridgeItems })} // Pass addToFridge here
+        >
           <Text>Add Ingredient</Text>
         </Pressable>
-
       </View>
     </View>
   );
 };
+
+
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -45,11 +66,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     paddingTop: 40
   },
-  fridgeItems: {
-    width: screenWidth * 0.9,
-    height: 250,
-    backgroundColor: '#d3d3d3',
-    marginBottom: 10,
+  fridgeItems:{
+    
   },
   buttonItems: {
     marginTop: 10,
