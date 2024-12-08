@@ -1,17 +1,16 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
-import { RecipeList } from "./recipeList";
-import { Recipe } from "./recipe";
+import React, { useEffect, useState } from "react";
+import { View, Text, FlatList, StyleSheet, Image } from "react-native";
 
 const SPOONACULAR_API_KEY = '20d4411eec5744e79d7906bea977857e';
 const BASE_URL = 'https://api.spoonacular.com/recipes/complexSearch';
 
-export default function recipes() {
+
+export default function RecipesPage() {
     const [recipes, setRecipes] = useState([]);
-    const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const fetchRecipes = async () => {
+    useEffect(() => {
+      const fetchRecipes = async () => {
         setLoading(true);
         try {
           const response = await fetch(
@@ -28,9 +27,24 @@ export default function recipes() {
           setLoading(false);
         }
     };
+    fetchRecipes();
+    }, []);
+   
+    const renderRecipe = ({ item }) => (
+      <View>
+        <Image source={{ uri: item.image }}/>
+        <Text>{item.title}</Text>
+      </View>
+    )
+
     return (
-        <View style={styles.container}>
-            <RecipeList recipes={recipes}/>
+        <View>   
+          <FlatList
+            data={recipes}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderRecipe}
+            contentContainerStyle={styles.listContent}
+          />
         </View>
     );
 }
