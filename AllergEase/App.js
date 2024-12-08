@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
-import RecipesPage from './recipes';
+import RecipesPage from './recipes/recipes';
 import FridgePage from './fridge';
 import ShoplistPage from './shoplist';
 import ProfilePage from './loginpages/profiel';
