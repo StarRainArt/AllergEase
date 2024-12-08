@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 
 export default function RecipeList({ recipes }) {
   return (
-    <View style={styles.container}>
+    <View>
       <FlatList
         data={recipes}
         keyExtractor={(recipe) => recipe.id}
