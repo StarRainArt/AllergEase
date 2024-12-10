@@ -6,10 +6,11 @@ import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
 import RecipesPage from './recipes';
 import FridgeStack from './fridgepages/FridgeStack';
-import ShoplistPage from './shoplist';
+import ShoplistPage from './pages/boodschappen';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';
+import FavoriteRecipesScreen from './pages/favoriet';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,6 +41,9 @@ export default function App() {
         {/* Pages accessed from Profile */}
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />
+        
+        {/* Pages accessed from Pages */}
+        <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
 
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />

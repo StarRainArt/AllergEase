@@ -60,6 +60,7 @@ const ShoppingListScreen = () => {
           </View>
         )}
       />
+      <Button title="Favorite Recipes" onPress={() => navigation.navigate('FavoriteRecipes')} />
     </View>
   );
 };
