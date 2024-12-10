@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFonts } from "expo-font";
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
 
 export default function EditAllergiesPage({ navigation }) {
+  const [fontsLoaded] = useFonts({
+    "Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
+    "DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
+    "DynaPuffMedium": require("../assets/fonts/DynaPuff-Medium.ttf"),
+    "BalooPaaji2": require("../assets/fonts/BalooPaaji2-VariableFont_wght.ttf"),
+  });
+
   const allergiesList = [
     'Gluten', 'Lupine', 'Selderij', 'Ei', 'Vis',
     'Pinda', 'Soja', 'Lactose', 'Schaaldieren',
@@ -37,73 +46,90 @@ export default function EditAllergiesPage({ navigation }) {
 
   const renderItem = ({ item }) => (
     <View style={styles.item}>
-      <Text style={styles.text}>{item}</Text>
+      <Text style={styles.allergyText}>{item}</Text>
       <TouchableOpacity onPress={() => handleToggle(item)} style={styles.checkbox}>
         {selectedAllergies.includes(item) ? (
-          <View style={styles.checkedBox} />
-        ) : (
-          <View style={styles.uncheckedBox} />
-        )}
+          <>
+            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: 0.7, top: 0.7 }} />
+            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: 0.7, top: -0.7 }} />
+            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: -0.7, top: 0.7 }} />
+            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: -0.7, top: -0.7 }} />
+            <Icon name="check" size={30} color="#472D30" />
+          </>
+        ) : null}
       </TouchableOpacity>
     </View>
   );
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Select your Allergies</Text>
       <FlatList
         data={allergiesList}
         keyExtractor={(item) => item}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
       />
-      <View style={styles.buttonContainer}>
-        <Button title="Save" onPress={handleSave} />
-      </View>
+      <Pressable style={styles.saveButton} onPress={handleSave}>
+        <Text style={styles.saveButtonText}>SAVE</Text>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    background: {
-        padding: 30,
-    },
-    container: {
-        flex: 1,
-    },
-    listContainer: {
-        paddingBottom: 100, // Space for the Save button
-    },
-    item: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-    },
-    text: {
-        fontSize: 16,
-    },
-    checkbox: {
-        width: 20,
-        height: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    uncheckedBox: {
-        width: 18,
-        height: 18,
-        borderWidth: 2,
-        borderColor: '#000',
-        backgroundColor: 'transparent',
-    },
-    checkedBox: {
-        width: 18,
-        height: 18,
-        backgroundColor: '#000',
-    },
-    buttonContainer: {
-        padding: 10,
-        backgroundColor: '#fff',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFF5E1',
+    padding: 20,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 35,
+    fontFamily: 'DynaPuffMedium',
+    color: '#472D30',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  listContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#C9CBA3',
+    borderRadius: 10,
+    paddingVertical: 2,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    width: '95%',
+  },
+  allergyText: {
+    fontFamily: 'BalooPaaji2',
+    fontSize: 25,
+    color: '#472D30',
+  },
+  checkbox: {
+    width: 30,
+    height: 30,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF5E1',
+  },
+  saveButton: {
+    backgroundColor: '#E26D5C',
+    borderRadius: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 50,
+    marginTop: 20,
+  },
+  saveButtonText: {
+    fontFamily: 'DynaPuff',
+    fontSize: 25,
+    color: '#FFF5E1',
+    textAlign: 'center',
+  },
 });
