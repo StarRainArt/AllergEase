@@ -9,17 +9,22 @@ const AddToFridgePage = ({ navigation, route }) => {
     setIngredientName(text);
   };
 
+
+  //Adding ingredients via barcode
+  //https://world.openfoodfacts.net/api/v2/product/{barcode}?fields=product_name
+
+  //Adding ingredients manually
   const fetchIngredients = async (ingredientName) => {
     try {
       const response = await fetch(
         `https://api.spoonacular.com/food/ingredients/search?query=${ingredientName}&apiKey=bdab5cb788674ef286de1e7e6294097d`
       );
       const data = await response.json();
-      console.log('API Response:', data); // Log the full response
-      return data.results; // Return results (not ingredients)
+      console.log('API Response:', data);
+      return data.results;
     } catch (error) {
       console.error("Error fetching ingredients:", error);
-      return []; // Return an empty array if there's an error
+      return [];
     }
   };
 

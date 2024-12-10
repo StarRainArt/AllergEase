@@ -3,7 +3,11 @@ import { View, Text, Button, FlatList, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function EditAllergiesPage({ navigation }) {
-  const allergiesList = ['Peanuts', 'Gluten', 'Dairy', 'Shellfish'];
+  const allergiesList = [
+    'Gluten', 'Lupine', 'Selderij', 'Ei', 'Vis',
+    'Pinda', 'Soja', 'Lactose', 'Schaaldieren',
+    'Mosterd', 'Sesamzaad', 'Sulfiet', 'Weekdieren', 'Noten',
+  ];
   const [selectedAllergies, setSelectedAllergies] = useState([]);
 
   useEffect(() => {
