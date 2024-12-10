@@ -6,7 +6,7 @@ import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
 import RecipesPage from './recipes';
 import FridgePage from './fridge';
-import ShoplistPage from './shoplist';
+import ShoplistPage from './pages/boodschappen';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';
