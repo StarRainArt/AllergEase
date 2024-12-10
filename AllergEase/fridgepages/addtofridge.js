@@ -1,92 +1,116 @@
-import React, { useState } from 'react';
-import { Text, ScrollView, View, StyleSheet, Pressable, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, ScrollView, View, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
+import { Camera, CameraType} from 'expo-camera';
+import { CameraView } from 'expo-camera';  // Correct import for CameraView
 
-const AddToFridgePage = ({ navigation, route }) => {
+const AddToFridgePage = ({ route }) => {
   const [ingredientName, setIngredientName] = useState('');
-  const { addToFridge } = route.params;  // Access addToFridge function from params
+  const [hasPermission, setHasPermission] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const { addToFridge } = route.params;
 
-  const handleChangeText = (text) => {
-    setIngredientName(text);
+  // Request camera permissions
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Camera.requestCameraPermissionsAsync();
+        console.log("Camera permission status:", status);  // Debugging log
+        setHasPermission(status === 'granted');
+      } catch (error) {
+        console.error("Permission request error:", error);  // Debugging error
+        setHasPermission(false);
+      }
+    })();
+  }, []);
+
+  // Handle barcode scanning
+  const handleBarCodeScanned = ({ type, data }) => {
+    setIsScanning(false);
+    Alert.alert("Barcode Scanned", `Type: ${type}\nData: ${data}`, [
+      { text: "OK" },
+    ]);
+    fetchProductInfo(data);
   };
 
-
-  //Adding ingredients via barcode
-  //https://world.openfoodfacts.net/api/v2/product/{barcode}?fields=product_name
-
-  //Adding ingredients manually
-  const fetchIngredients = async (ingredientName) => {
+  // Fetch product information from the API
+  const fetchProductInfo = async (barcode) => {
     try {
       const response = await fetch(
-        `https://api.spoonacular.com/food/ingredients/search?query=${ingredientName}&apiKey=bdab5cb788674ef286de1e7e6294097d`
+        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
       );
-      const data = await response.json();
-      console.log('API Response:', data);
-      return data.results;
-    } catch (error) {
-      console.error("Error fetching ingredients:", error);
-      return [];
-    }
-  };
+      const product = await response.json();
 
-  const handleSubmit = async () => {
-    if (ingredientName.trim()) {
-      const ingredients = await fetchIngredients(ingredientName);
-
-      // Filter the results to only get the exact match (case-insensitive)
-      const exactMatch = ingredients.filter(
-        (ingredient) =>
-          ingredient.name.toLowerCase() === ingredientName.toLowerCase()
-      );
-
-      console.log('Exact match ingredients:', exactMatch);  // Debugging step
-
-      if (exactMatch.length > 0) {
-        // Use the addToFridge function from route.params
-        addToFridge(exactMatch);  // This will call the function in FridgePage to update fridgeItems
+      if (product.status === 1) {
+        Alert.alert("Product Found", product.product.product_name);
+        addToFridge([{ name: product.product.product_name }]);
       } else {
-        console.log('No exact match ingredients found');
+        Alert.alert("Product Not Found", "No product found for this barcode.");
       }
-      setIngredientName('');  // Reset the input field
-    } else {
-      console.log('Please enter a valid ingredient name');
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      Alert.alert("Error", "Failed to fetch product details.");
     }
   };
+
+  // Handle manual ingredient addition
+  const handleSubmit = () => {
+    if (ingredientName.trim()) {
+      addToFridge([{ name: ingredientName }]);
+      setIngredientName('');
+    } else {
+      Alert.alert("Invalid Input", "Please enter an ingredient name.");
+    }
+  };
+
+  // Render permission request feedback
+  if (hasPermission === null) {
+    return <Text>Requesting camera permission...</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera. Please grant permissions to use the camera.</Text>;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.section}>
         <Text style={styles.title}>Scan Barcode or Add Manually</Text>
-        <Pressable style={styles.button}>
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            console.log("Scan Barcode button pressed");  // Debugging log
+            setIsScanning(true); // Set isScanning to true to show CameraView
+          }}
+        >
           <Text style={styles.buttonText}>Scan Barcode</Text>
         </Pressable>
       </View>
 
+      {isScanning && (
+        <CameraView
+          style={styles.camera}
+          type={"back"}
+          onBarCodeScanned={handleBarCodeScanned}
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr', 'ean13', 'ean8', 'upc_e', 'upc_a', 'code39', 'itf14', 'codabar'],  // List barcode types to scan
+          }}
+        />
+      )}
+
       <View style={styles.section}>
         <Text style={styles.title}>Add Ingredient Manually:</Text>
-
-        <Text>Select Category (Placeholder)</Text>
-        <Text>Select the category of the ingredient</Text>
-
-        <Text>Ingredient Name:</Text>
         <TextInput
           style={styles.input}
           placeholder="E.g., Tomatoes"
           value={ingredientName}
-          onChangeText={handleChangeText}
+          onChangeText={setIngredientName}
         />
-
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Add Ingredient</Text>
         </Pressable>
       </View>
-
-      <View style={styles.section}>
-        <Text style={styles.title}>Recent Ingredients (Placeholder)</Text>
-      </View>
     </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -127,6 +151,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  camera: {
+    width: '100%',
+    height: 300,
+    marginVertical: 20,
+  },
 });
 
 export default AddToFridgePage;
+
