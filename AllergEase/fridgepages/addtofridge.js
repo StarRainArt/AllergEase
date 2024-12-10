@@ -9,6 +9,11 @@ const AddToFridgePage = ({ navigation, route }) => {
     setIngredientName(text);
   };
 
+
+  //Adding ingredients via barcode
+  //https://world.openfoodfacts.net/api/v2/product/{barcode}?fields=product_name
+
+  //Adding ingredients manually
   const fetchIngredients = async (ingredientName) => {
     try {
       const response = await fetch(
