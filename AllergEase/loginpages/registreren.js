@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Alert, Pressable, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
+import styles from "../style";
 
 export default function RegisterPage({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -35,8 +36,8 @@ export default function RegisterPage({ navigation }) {
 
   return (
     <View style={styles.background}>
-      <Text style={styles.logo}>Allerg<Text style={{ color: "#E26D5C" }}>Ease</Text></Text>
-      <View style={styles.inARow}>
+      <Text style={regist.logo}>Allerg<Text style={{ color: "#E26D5C" }}>Ease</Text></Text>
+      <View style={regist.inARow}>
         <Pressable onPress={() => navigation.navigate('Login')}><Text style={styles.title}>{'<'}</Text></Pressable>
         <Text style={styles.title}>Sign Up</Text>
         <View></View>
@@ -74,19 +75,13 @@ export default function RegisterPage({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const regist = StyleSheet.create({
   inARow: {
     flexDirection: "row", 
     alignItems: 'center', 
     justifyContent: "space-between", 
     width: "100%"
-  },
-  background: {
-    padding: 30,
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: "#FFF5E1",
-  },
+  }, 
   logo: {
     textAlign: "center",
     fontSize: 45,
@@ -95,56 +90,4 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     includeFontPadding: false
   },
-  title: {
-    textAlign: "center",
-    fontSize: 40,
-    fontFamily: "DynaPuffMedium",
-    color: "#472D30",
-    paddingVertical: 20
-  },
-  sectionGreen: {
-    backgroundColor: "#C9CBA3",
-    color: "#472D30",
-    borderRadius: 15,
-    padding: 5
-  },
-  sectionYellow: {
-    backgroundColor: "#FFE1A8",
-    color: "#472D30",
-    borderRadius: 15,
-    padding: 5
-  },
-  buttonRed: {
-    backgroundColor: "#E26D5C",
-    borderRadius: 10,
-    paddingVertical: 5
-  },
-  buttonGreen: {
-    backgroundColor: "#C9CBA3",
-    borderRadius: 15,
-    paddingVertical: 5
-  },
-  greenButtonText: {
-    color: "#472D30",
-    fontFamily: "DynaPuff",
-    textAlign: "center",
-  },
-  redButtonText: {
-    color: "#FFF5E1",
-    fontFamily: "DynaPuff",
-    textAlign: "center",
-  },
-  input: {
-    backgroundColor: "#FFE1A8",
-    color: "#472D30",
-    paddingLeft: 15,
-    paddingTop: 5,
-    paddingBottom: 0,
-    width: "95%",
-    borderRadius: 15,
-    marginBottom: 20,
-    fontSize: 25,
-    fontFamily: "BalooPaaji2",
-    textAlignVertical: "bottom"
-  }
 });

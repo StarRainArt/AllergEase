@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert, Text, Pressable, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
+import styles from "../style";
 
 export default function LoginPage({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -30,8 +31,8 @@ export default function LoginPage({ navigation }) {
 
   return (
     <View style={styles.background}>
-      <Text style={styles.logo}>Allerg<Text style={{color: "#E26D5C"}}>Ease</Text></Text>
-      <Text style={styles.quote}>Manage your Allergies with <Text style={{color: "#E26D5C"}}>Ease</Text></Text>
+      <Text style={login.logo}>Allerg<Text style={{color: "#E26D5C"}}>Ease</Text></Text>
+      <Text style={login.quote}>Manage your Allergies with <Text style={{color: "#E26D5C"}}>Ease</Text></Text>
       <TextInput placeholder="Email" onChangeText={setEmail} value={email} style={styles.input}/>
       <TextInput placeholder="Password" secureTextEntry onChangeText={setPassword} value={password} style={styles.input}/>
       <Pressable onPress={handleLogin} style={[styles.buttonGreen, {width: "60%"}]}>
@@ -45,15 +46,14 @@ export default function LoginPage({ navigation }) {
           <View style={{flex: 0.8, height: 4, backgroundColor: '#472D30'}} />
       </View>
       <View style={{flexDirection: "row", alignItems: 'center'}}>
-        <Text style={styles.registerText}>Create a </Text>
-        <Pressable onPress={() => navigation.navigate('Register')}><Text style={styles.registerLink}>New Account</Text></Pressable>
+        <Text style={login.registerText}>Create a </Text>
+        <Pressable onPress={() => navigation.navigate('Register')}><Text style={login.registerLink}>New Account</Text></Pressable>
       </View>
-      {/* <Button title="Register" onPress={() => navigation.navigate('Register')} /> */}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const login = StyleSheet.create({
   registerText: {
     fontFamily: "DynaPuff",
     color: "#472D30",
@@ -64,12 +64,6 @@ const styles = StyleSheet.create({
     color: "#E26D5C",
     textDecorationLine: "underline",
     fontSize: 25
-  },
-  background: {
-    padding: 30,
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: "#FFF5E1",
   },
   logo: {
     textAlign: "center",
@@ -86,56 +80,4 @@ const styles = StyleSheet.create({
     color: "#472D30",
     marginBottom: 30,
   },
-  title: {
-    textAlign: "center",
-    fontSize: 40,
-    fontFamily: "DynaPuffMedium",
-    color: "#472D30"
-  },
-  sectionGreen: {
-    backgroundColor: "#C9CBA3",
-    color: "#472D30",
-    borderRadius: 15,
-    padding: 5
-  },
-  sectionYellow: {
-    backgroundColor: "#FFE1A8",
-    color: "#472D30",
-    borderRadius: 15,
-    padding: 5
-  },
-  buttonRed: {
-    backgroundColor: "#E26D5C",
-    borderRadius: 10,
-    paddingVertical: 5
-  },
-  buttonGreen: {
-    backgroundColor: "#C9CBA3",
-    borderRadius: 15,
-    paddingVertical: 5
-  },
-  greenButtonText: {
-    color: "#472D30",
-    fontFamily: "DynaPuff",
-    textAlign: "center",
-  },
-  redButtonText: {
-    color: "#FFF5E1",
-    fontFamily: "DynaPuff",
-    textAlign: "center",
-  },
-  input: {
-    backgroundColor: "#FFE1A8",
-    color: "#472D30",
-    paddingLeft: 15,
-    paddingTop: 5,
-    paddingBottom: 0,
-    width: "95%",
-    borderRadius: 15,
-    marginBottom: 15,
-    fontSize: 25,
-    fontFamily: "BalooPaaji2",
-    // includeFontPadding: false,
-    textAlignVertical: "bottom"
-  }
 });
