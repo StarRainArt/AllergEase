@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, ScrollView, View, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
-import { Camera, CameraType} from 'expo-camera';
-import { CameraView } from 'expo-camera';  // Correct import for CameraView
+import { Camera, CameraView } from 'expo-camera';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddToFridgePage = ({ route }) => {
   const [ingredientName, setIngredientName] = useState('');
@@ -12,14 +12,8 @@ const AddToFridgePage = ({ route }) => {
   // Request camera permissions
   useEffect(() => {
     (async () => {
-      try {
-        const { status } = await Camera.requestCameraPermissionsAsync();
-        console.log("Camera permission status:", status);  // Debugging log
-        setHasPermission(status === 'granted');
-      } catch (error) {
-        console.error("Permission request error:", error);  // Debugging error
-        setHasPermission(false);
-      }
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === 'granted');
     })();
   }, []);
 
@@ -35,9 +29,7 @@ const AddToFridgePage = ({ route }) => {
   // Fetch product information from the API
   const fetchProductInfo = async (barcode) => {
     try {
-      const response = await fetch(
-        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-      );
+      const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
       const product = await response.json();
 
       if (product.status === 1) {
@@ -47,15 +39,26 @@ const AddToFridgePage = ({ route }) => {
         Alert.alert("Product Not Found", "No product found for this barcode.");
       }
     } catch (error) {
-      console.error("Error fetching product:", error);
       Alert.alert("Error", "Failed to fetch product details.");
     }
   };
 
   // Handle manual ingredient addition
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (ingredientName.trim()) {
-      addToFridge([{ name: ingredientName }]);
+      // Get existing fridge items from AsyncStorage
+      const storedItems = await AsyncStorage.getItem('fridgeItems');
+      let fridgeItems = storedItems ? JSON.parse(storedItems) : [];
+
+      // Add the new ingredient to the fridge
+      const updatedItems = [...fridgeItems, { name: ingredientName }];
+      
+      // Save the updated fridge items to AsyncStorage
+      await AsyncStorage.setItem('fridgeItems', JSON.stringify(updatedItems));
+
+      // Update the fridge items in the parent component
+      addToFridge(updatedItems);
+
       setIngredientName('');
     } else {
       Alert.alert("Invalid Input", "Please enter an ingredient name.");
@@ -77,8 +80,7 @@ const AddToFridgePage = ({ route }) => {
         <Pressable
           style={styles.button}
           onPress={() => {
-            console.log("Scan Barcode button pressed");  // Debugging log
-            setIsScanning(true); // Set isScanning to true to show CameraView
+            setIsScanning(true);
           }}
         >
           <Text style={styles.buttonText}>Scan Barcode</Text>
@@ -88,11 +90,8 @@ const AddToFridgePage = ({ route }) => {
       {isScanning && (
         <CameraView
           style={styles.camera}
-          type={"back"}
+          type={'back'}
           onBarCodeScanned={handleBarCodeScanned}
-          barcodeScannerSettings={{
-            barcodeTypes: ['qr', 'ean13', 'ean8', 'upc_e', 'upc_a', 'code39', 'itf14', 'codabar'],  // List barcode types to scan
-          }}
         />
       )}
 
@@ -159,4 +158,3 @@ const styles = StyleSheet.create({
 });
 
 export default AddToFridgePage;
-

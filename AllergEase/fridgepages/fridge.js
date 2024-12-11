@@ -1,23 +1,37 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Text, ScrollView, View, StyleSheet, Pressable, Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const FridgePage = ({ navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
-  
+
+  // Fetch fridge items from AsyncStorage when the component loads
   useEffect(() => {
-    navigation.setOptions({
-      addToFridge: (items) => {
-        console.log('Adding to fridge:', items);  // Debugging step
-        setFridgeItems((prev) => [...prev, ...items]);
-      },
-    });
-  }, [navigation]);
+    const fetchFridgeItems = async () => {
+      const storedItems = await AsyncStorage.getItem('fridgeItems');
+      if (storedItems) {
+        setFridgeItems(JSON.parse(storedItems));
+      }
+    };
+
+    fetchFridgeItems();
+  }, []);
+
+  // Save fridge items to AsyncStorage whenever the list changes
+  useEffect(() => {
+    const saveFridgeItems = async () => {
+      await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
+    };
+
+    if (fridgeItems.length > 0) {
+      saveFridgeItems();
+    }
+  }, [fridgeItems]);
 
   return (
     <View style={styles.container}>
-      <Text>Your fridge</Text>
       <ScrollView>
         {fridgeItems.length > 0 ? (
           fridgeItems.map((item, index) => (
@@ -62,8 +76,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     paddingTop: 40
   },
-  fridgeItems:{
-
+  fridgeItems: {
+    borderColor: 'blue',
   },
   buttonItems: {
     marginTop: 10,
