@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Text, ScrollView, View, StyleSheet, Pressable, Dimensions, TouchableOpacity } from 'react-native';
+import { Text, ScrollView, View, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const { width: screenWidth } = Dimensions.get('window');
 
 const FridgePage = ({ navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
 
-  // Fetch fridge items from AsyncStorage when the component loads
   useEffect(() => {
     const fetchFridgeItems = async () => {
       const storedItems = await AsyncStorage.getItem('fridgeItems');
@@ -104,6 +101,7 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     fontSize: 18,
+    padding: 10
   },
   buttonItems: {
     marginTop: 10,
@@ -124,3 +122,4 @@ const styles = StyleSheet.create({
 });
 
 export default FridgePage;
+
