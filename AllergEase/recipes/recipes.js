@@ -8,26 +8,34 @@ const SEARCH = 'https://api.spoonacular.com/recipes/';
 
 
 
-export default function RecipesPage({query = null}) {
+export default function RecipesPage() {
   const recipesPerPage = 10;
   const maxPages = 2;
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [] });
+
 
   useEffect(() => {
-    const getRecipesSearch = async (query = null, page = 1) => {
+    const getRecipesSearch = async (filter =filters, page = 1) => {
       try {
-        let url;
-        if (query == null) {
-          url = `${SEARCH}/complexSearch?number=${recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`
-        } else {
-          url = `${SEARCH}complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&query=${query}&apiKey=${SPOONACULAR_API_KEY}`
+        let url = `${SEARCH}/complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`;
+        if (filter.query !== null) {
+          url += `&query=${filter.query}`;
+        }
+        if (filter.cuisine) {
+          url += `&cuisine=${filter.cuisine}`;
+        }
+        if (filter.diet) {
+          url += `&diet=${filter.diet}`;
+        }
+        if (filter.ingredients.length) {
+          url += `&includeIngredients=${filter.ingredients.join(",")}`;
         }
         const response = await fetch(url);
         const json = await response.json();
-        console.log(json);
         setData(prevData => [...prevData, ...json.results]);
       }
       catch (error) {
@@ -38,8 +46,8 @@ export default function RecipesPage({query = null}) {
         setIsFetchingMore(false);
       }
     }
-    getRecipesSearch(query, page);
-  }, [query, page]);
+    getRecipesSearch(filters, page);
+  }, [filters, page]);
 
   const loadMoreRecipes = () => {
     if (!isFetchingMore && page < maxPages) {
@@ -67,7 +75,7 @@ export default function RecipesPage({query = null}) {
         data={data}
         renderItem={({item}) => <RenderRecipe title={item.title} image={item.image} />}
         keyExtractor={(item) => item.id.toString()}
-        onEndReached={!query ? null : loadMoreRecipes}
+        onEndReached={!filters.query && !filters.diet && !filters.cuisine && filters.ingredients.length < 1 ? null : loadMoreRecipes}
         onEndReachedThreshold={0.5}
         ListFooterComponent={isFetchingMore ? <Text>Loading...</Text> : <Text>Filter for more</Text>}
       />
