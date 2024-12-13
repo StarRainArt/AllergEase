@@ -88,6 +88,9 @@ export default function App() {
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         {/* <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />    */}
 
+        {/* Pages Accessed from Recipes */}
+        <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
+
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
       </Stack.Navigator>
