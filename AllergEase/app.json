@@ -1,5 +1,6 @@
 {
   "expo": {
+    "permissions": ["CAMERA"],
     "name": "AllergEase",
     "slug": "AllergEase",
     "version": "1.0.0",

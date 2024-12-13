@@ -6,13 +6,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon l
 import allergyList from '../allergies';
 
 export default function EditAllergiesPage({ navigation }) {
-  const [fontsLoaded] = useFonts({
-    "Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
-    "DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
-    "DynaPuffMedium": require("../assets/fonts/DynaPuff-Medium.ttf"),
-    "BalooPaaji2": require("../assets/fonts/BalooPaaji2-VariableFont_wght.ttf"),
-  });
-
+  const allergiesList = [
+    'Gluten', 'Lupine', 'Selderij', 'Ei', 'Vis',
+    'Pinda', 'Soja', 'Lactose', 'Schaaldieren',
+    'Mosterd', 'Sesamzaad', 'Sulfiet', 'Weekdieren', 'Noten',
+  ];
   const [selectedAllergies, setSelectedAllergies] = useState([]);
 
   useEffect(() => {
