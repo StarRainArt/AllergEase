@@ -7,7 +7,7 @@ const AddToFridgePage = ({ route }) => {
   const [ingredientName, setIngredientName] = useState('');
   const [hasPermission, setHasPermission] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
-  const { addToFridge } = route.params;  // Access addToFridge function from params
+  const { addToFridge } = route.params; // Access addToFridge function from params
 
   // Request camera permissions
   useEffect(() => {
@@ -40,10 +40,10 @@ const AddToFridgePage = ({ route }) => {
       const product = await response.json();
 
       if (product.status === 1) {
-        Alert.alert("Product Found", product.product_name);
-        addToFridge((prevItems) => [...prevItems, { name: product.product_name }]);
+        Alert.alert("Product Found", product.product.product_name);
+        addToFridge((prevItems) => [...prevItems, { name: product.product.product_name }]);
       } else {
-          Alert.alert("Product Not Found", "No product found for this barcode.");
+        Alert.alert("Product Not Found", "No product found for this barcode.");
       }
     } catch (error) {
       console.error("Error fetching product:", error);
@@ -54,12 +54,12 @@ const AddToFridgePage = ({ route }) => {
   // Handle ingredient submission (manual input)
   const handleSubmit = async () => {
     const trimmedInput = ingredientName.trim();
-  
+
     if (!trimmedInput) {
       Alert.alert("Invalid Input", "Please enter an ingredient name or barcode.");
       return;
     }
-  
+
     try {
       if (/^\d+$/.test(trimmedInput)) {
         // Input is a numeric string, assume it's a barcode
@@ -67,7 +67,7 @@ const AddToFridgePage = ({ route }) => {
           `https://world.openfoodfacts.org/api/v2/product/${trimmedInput}.json`
         );
         const productData = await response.json();
-  
+
         if (productData.status === 1) {
           // Product found for the barcode
           addToFridge((prevItems) => [...prevItems, { name: productData.product.product_name }]);
@@ -81,13 +81,13 @@ const AddToFridgePage = ({ route }) => {
           `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${trimmedInput}&json=true`
         );
         const ingredientData = await ingredientResponse.json();
-  
+
         if (ingredientData.count > 0) {
           // Check if an exact match exists
           const matchingIngredient = ingredientData.products.find(product =>
             product.product_name.toLowerCase() === trimmedInput.toLowerCase()
           );
-  
+
           if (matchingIngredient) {
             addToFridge((prevItems) => [...prevItems, { name: matchingIngredient.product_name }]);
             setIngredientName(''); // Reset the input field
@@ -103,7 +103,6 @@ const AddToFridgePage = ({ route }) => {
       Alert.alert("Error", "Failed to fetch product or ingredient details.");
     }
   };
-  
 
   // Render permission request feedback
   if (hasPermission === null) {
@@ -132,18 +131,18 @@ const AddToFridgePage = ({ route }) => {
       {isScanning && (
         <CameraView
           style={styles.camera}
-          type={'back'}
-          onBarCodeScanned={handleBarCodeScanned}
+          onBarcodeScanned={handleBarCodeScanned}
+          flash="auto" // Adjust other props as needed
+          facing="back"
         />
       )}
 
-
       <View style={styles.section}>
-        <Text style={styles.title}>Voeg handmatig een ingredient toe:</Text>
-        <Text>Ingredient Naam of barcode:</Text>
+        <Text style={styles.title}>Add Ingredient Manually:</Text>
+        <Text>Ingredient Name or Barcode:</Text>
         <TextInput
           style={styles.input}
-          placeholder="E.g., Tomaten of barcode product"
+          placeholder="E.g., Tomatoes or product barcode"
           value={ingredientName}
           onChangeText={setIngredientName}
         />
@@ -203,5 +202,3 @@ const styles = StyleSheet.create({
 });
 
 export default AddToFridgePage;
-
-
