@@ -1,36 +1,183 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
-import { RecipeList } from "./recipeList";
-import { Recipe } from "./recipe";
-
+import React, { useCallback, useState } from "react";
+import { View, Text, FlatList, StyleSheet, Image, Pressable, Dimensions } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
+import { useFonts } from "expo-font";
 const SPOONACULAR_API_KEY = '20d4411eec5744e79d7906bea977857e';
-const BASE_URL = 'https://api.spoonacular.com/recipes/complexSearch';
+const SEARCH = 'https://api.spoonacular.com/recipes/';
 
-export default function recipes() {
-    const [recipes, setRecipes] = useState([]);
-    const [query, setQuery] = useState('');
-    const [loading, setLoading] = useState(false);
+export default function RecipesPage({ navigation }) {
+	const recipesPerPage = 10;
+	const maxPages = 2;
+	const [data, setData] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [page, setPage] = useState(1);
+	const [isFetchingMore, setIsFetchingMore] = useState(false);
+	const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [] });
+	const [selectedAllergies, setSelectedAllergies] = useState([]);
+	const [fontsLoaded] = useFonts({
+		"Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
+		"DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
+		"DynaPuffMedium": require("../assets/fonts/DynaPuff-Medium.ttf"),
+		"BalooPaaji2": require("../assets/fonts/BalooPaaji2-VariableFont_wght.ttf"),
+	});
 
-    const fetchRecipes = async () => {
-        setLoading(true);
-        try {
-          const response = await fetch(
-            `${BASE_URL}?query=${query}&number=20&apiKey=${SPOONACULAR_API_KEY}`
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          setRecipes(data.results);
-        } catch (error) {
-          console.error('Error fetching recipes:', error);
-        } finally {
-          setLoading(false);
-        }
-    };
-    return (
-        <View style={styles.container}>
-            <RecipeList recipes={recipes}/>
-        </View>
-    );
+	const fetchUser = async () => {
+		const userData = await AsyncStorage.getItem('user');
+		const user = JSON.parse(userData);
+		setSelectedAllergies(user.allergies || []);
+	};
+	const getRecipesSearch = async (filter = filters, page = 1) => {
+		try {
+			let url = `${SEARCH}/complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`;
+			if (filter.query !== null) {
+				url += `&query=${filter.query}`;
+			}
+			if (filter.cuisine) {
+				url += `&cuisine=${filter.cuisine}`;
+			}
+			if (filter.diet) {
+				url += `&diet=${filter.diet}`;
+			}
+			if (filter.ingredients.length) {
+				url += `&includeIngredients=${filter.ingredients.join(",")}`;
+			}
+			if (selectedAllergies.length > 0) {
+				url += `&intolerances=${selectedAllergies.join(",")}`;
+
+			}
+			console.log(url);
+			const response = await fetch(url);
+			const json = await response.json();
+			console.log(json);
+			setData(prevData => [...prevData, ...json.results]);
+		}
+		catch (error) {
+			console.error("Failed to fetch recipe details:", error);
+		}
+		finally {
+			setLoading(false);
+			setIsFetchingMore(false);
+		}
+	}
+	useFocusEffect(
+		useCallback(() => {
+			setData([]);
+			fetchUser();
+			getRecipesSearch(filters, page);
+		}, [filters, page])
+	);
+
+	const loadMoreRecipes = () => {
+		if (!isFetchingMore && page < maxPages) {
+			setIsFetchingMore(true);
+			setPage(prevPage => prevPage + 1);
+		}
+	};
+
+	const RenderRecipe = ({ title, image }) => (
+		<View style={[styles.sectionGreen,{ marginBottom: 4,}]}>
+			<Text style={[styles.title, {paddingVertical: 10,fontSize: 20}]}>{title}</Text>
+			{image && <Image source={{ uri: image }} style={recipesStyle.image} />}
+		</View>
+	);
+
+
+	if (loading && page == 1) {
+		return <View>
+			<Text>loading</Text>
+		</View>
+	}
+	return (
+		<View style={styles.background}>
+			<Text style={styles.title}>Recipes</Text>
+			<FlatList
+				data={data}
+				renderItem={({ item }) => <RenderRecipe title={item.title} image={item.image} />}
+				keyExtractor={(item) => item.id.toString()}
+				onEndReached={!filters.query && !filters.diet && !filters.cuisine && filters.ingredients.length < 1 ? null : loadMoreRecipes}
+				onEndReachedThreshold={0.5}
+				ListFooterComponent={isFetchingMore ? <Text>Loading...</Text> : null}
+			/>
+			<Pressable style={styles.buttonRed} title="Filter" onPress={() => navigation.navigate('FilterRecipes')}><Text style={styles.redButtonText}>filter</Text></Pressable>
+		</View>
+	);
+
 }
+const { width, height } = Dimensions.get('window');
+
+// Styling temporary
+const recipesStyle = StyleSheet.create({
+	container: {
+		flex: 1,
+		marginTop: 3,
+	},
+	image: {
+		width: width*0.8,
+		alignSelf: 'center',
+		height: 100,
+	},
+});
+const styles = StyleSheet.create({
+	background: {
+		padding: 30,
+		flex: 1,
+		alignItems: 'center',
+		backgroundColor: "#FFF5E1",
+	  },
+	  title: {
+		textAlign: "center",
+		fontSize: 40,
+		fontFamily: "DynaPuffMedium",
+		color: "#472D30",
+		paddingVertical: 20
+	  },
+	  sectionGreen: {
+		backgroundColor: "#C9CBA3",
+		color: "#472D30",
+		borderRadius: 15,
+		padding: 5
+	  },
+	  sectionYellow: {
+		backgroundColor: "#FFE1A8",
+		color: "#472D30",
+		borderRadius: 15,
+		padding: 5
+	  },
+	  buttonRed: {
+		backgroundColor: "#E26D5C",
+		width: "60%",
+		borderRadius: 15,
+		paddingVertical: 5
+	  },
+	  buttonGreen: {
+		backgroundColor: "#C9CBA3",
+		width: "60%",
+		borderRadius: 15,
+		paddingVertical: 5
+	  },
+	  greenButtonText: {
+		color: "#472D30",
+		fontSize: 25,
+		fontFamily: "DynaPuff",
+		textAlign: "center",
+	  },
+	  redButtonText: {
+		color: "#FFF5E1",
+		fontSize: 25,
+		fontFamily: "DynaPuff",
+		textAlign: "center",
+	  },
+	  input: {
+		backgroundColor: "#FFE1A8",
+		color: "#472D30",
+		paddingLeft: 15,
+		paddingTop: 5,
+		paddingBottom: 0,
+		width: "95%",
+		borderRadius: 15,
+		marginBottom: 20,
+		fontSize: 25,
+		fontFamily: "BalooPaaji2",
+		textAlignVertical: "bottom"
+	  },
+	});
