@@ -1,87 +1,158 @@
-import React, { useState } from 'react';
-import { Text, ScrollView, View, StyleSheet, Pressable, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, ScrollView, View, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
+import { Camera } from 'expo-camera'; 
+import { CameraView } from 'expo-camera';
 
-const AddToFridgePage = ({ navigation, route }) => {
+const AddToFridgePage = ({ route }) => {
   const [ingredientName, setIngredientName] = useState('');
-  const { addToFridge } = route.params;  // Access addToFridge function from params
+  const [hasPermission, setHasPermission] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const { addToFridge } = route.params;
 
-  const handleChangeText = (text) => {
-    setIngredientName(text);
+  // Request camera permissions
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Camera.requestCameraPermissionsAsync();
+        setHasPermission(status === 'granted');
+      } catch (error) {
+        console.error("Permission request error:", error);
+        setHasPermission(false);
+      }
+    })();
+  }, []);
+
+  // Handle barcode scanning
+  const handleBarCodeScanned = ({ type, data }) => {
+    setIsScanning(false);
+    Alert.alert("Barcode Scanned", `Type: ${type}\nData: ${data}`, [
+      { text: "OK" },
+    ]);
+    fetchProductInfo(data);
   };
 
-  const fetchIngredients = async (ingredientName) => {
+  // Fetch product information from the Open Food Facts API using barcode
+  const fetchProductInfo = async (barcode) => {
     try {
       const response = await fetch(
-        `https://api.spoonacular.com/food/ingredients/search?query=${ingredientName}&apiKey=bdab5cb788674ef286de1e7e6294097d`
+        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
       );
-      const data = await response.json();
-      console.log('API Response:', data);
-      return data.results;
-    } catch (error) {
-      console.error("Error fetching ingredients:", error);
-      return [];
-    }
-  };
+      const product = await response.json();
 
-  const handleSubmit = async () => {
-    if (ingredientName.trim()) {
-      const ingredients = await fetchIngredients(ingredientName);
-
-      // Filter the results to only get the exact match (case-insensitive)
-      const exactMatch = ingredients.filter(
-        (ingredient) =>
-          ingredient.name.toLowerCase() === ingredientName.toLowerCase()
-      );
-
-      console.log('Exact match ingredients:', exactMatch);  // Debugging step
-
-      if (exactMatch.length > 0) {
-        // Use the addToFridge function from route.params
-        addToFridge(exactMatch);  // This will call the function in FridgePage to update fridgeItems
+      if (product.status === 1) {
+        Alert.alert("Product Found", product.product.product_name);
+        addToFridge((prevItems) => [...prevItems, { name: product.product.product_name }]);
       } else {
-        console.log('No exact match ingredients found');
+        Alert.alert("Product Not Found", "No product found for this barcode.");
       }
-      setIngredientName('');  // Reset the input field
-    } else {
-      console.log('Please enter a valid ingredient name');
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      Alert.alert("Error", "Failed to fetch product details.");
     }
   };
+
+  // Handle ingredient submission (manual input)
+  const handleSubmit = async () => {
+    const trimmedInput = ingredientName.trim();
+
+    if (!trimmedInput) {
+      Alert.alert("Invalid Input", "Please enter an ingredient name or barcode.");
+      return;
+    }
+
+    try {
+      if (/^\d+$/.test(trimmedInput)) {
+        // Input is a numeric string, assume it's a barcode
+        const response = await fetch(
+          `https://world.openfoodfacts.org/api/v2/product/${trimmedInput}.json`
+        );
+        const productData = await response.json();
+
+        if (productData.status === 1) {
+          // Product found for the barcode
+          addToFridge((prevItems) => [...prevItems, { name: productData.product.product_name }]);
+          setIngredientName('');
+        } else {
+          Alert.alert("Product Not Found", "No product found for this barcode.");
+        }
+      } else {
+        // Input is a product name, search by name
+        const ingredientResponse = await fetch(
+          `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${trimmedInput}&json=true`
+        );
+        const ingredientData = await ingredientResponse.json();
+
+        if (ingredientData.count > 0) {
+          // Check if an exact match exists
+          const matchingIngredient = ingredientData.products.find(product =>
+            product.product_name.toLowerCase() === trimmedInput.toLowerCase()
+          );
+
+          if (matchingIngredient) {
+            addToFridge((prevItems) => [...prevItems, { name: matchingIngredient.product_name }]);
+            setIngredientName('');
+          } else {
+            Alert.alert("No Exact Match", "We couldn't find an exact match for this ingredient.");
+          }
+        } else {
+          Alert.alert("Ingredient Not Found", "No products found for this ingredient.");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      Alert.alert("Error", "Failed to fetch product or ingredient details.");
+    }
+  };
+
+  // Render permission request feedback
+  if (hasPermission === null) {
+    return <Text>Requesting camera permission...</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera. Please grant permissions to use the camera.</Text>;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.section}>
         <Text style={styles.title}>Scan Barcode or Add Manually</Text>
-        <Pressable style={styles.button}>
+
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            setIsScanning(true);
+          }}
+        >
           <Text style={styles.buttonText}>Scan Barcode</Text>
         </Pressable>
       </View>
 
+      {isScanning && (
+        <CameraView
+          style={styles.camera}
+          onBarcodeScanned={handleBarCodeScanned}
+          flash="auto"
+          facing="back"
+        />
+      )}
+
       <View style={styles.section}>
         <Text style={styles.title}>Add Ingredient Manually:</Text>
-
-        <Text>Select Category (Placeholder)</Text>
-        <Text>Select the category of the ingredient</Text>
-
-        <Text>Ingredient Name:</Text>
+        <Text>Ingredient Name or Barcode:</Text>
         <TextInput
           style={styles.input}
-          placeholder="E.g., Tomatoes"
+          placeholder="E.g., Tomatoes or product barcode"
           value={ingredientName}
-          onChangeText={handleChangeText}
+          onChangeText={setIngredientName}
         />
 
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Add Ingredient</Text>
         </Pressable>
       </View>
-
-      <View style={styles.section}>
-        <Text style={styles.title}>Recent Ingredients (Placeholder)</Text>
-      </View>
     </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -121,6 +192,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  camera: {
+    width: '100%',
+    height: 300,
+    marginVertical: 20,
   },
 });
 

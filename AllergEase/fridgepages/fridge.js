@@ -1,28 +1,51 @@
-import React, {useState, useEffect} from 'react';
-import { Button, Text, ScrollView, View, StyleSheet, Pressable, Dimensions } from 'react-native';
-
-const { width: screenWidth } = Dimensions.get('window');
+import React, { useState, useEffect } from 'react';
+import { Text, ScrollView, View, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FridgePage = ({ navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
-  
+
   useEffect(() => {
-    navigation.setOptions({
-      addToFridge: (items) => {
-        console.log('Adding to fridge:', items);  // Debugging step
-        setFridgeItems((prev) => [...prev, ...items]);
-      },
-    });
-  }, [navigation]);
+    const fetchFridgeItems = async () => {
+      const storedItems = await AsyncStorage.getItem('fridgeItems');
+      if (storedItems) {
+        setFridgeItems(JSON.parse(storedItems));
+      }
+    };
+
+    fetchFridgeItems();
+  }, []);
+
+  // Save fridge items to AsyncStorage whenever the list changes
+  useEffect(() => {
+    const saveFridgeItems = async () => {
+      await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
+    };
+
+    if (fridgeItems.length > 0) {
+      saveFridgeItems();
+    }
+  }, [fridgeItems]);
+
+  // Remove an item from the fridge
+  const removeItem = async (index) => {
+    const updatedItems = fridgeItems.filter((_, i) => i !== index);
+    setFridgeItems(updatedItems);
+
+    // Save the updated list to AsyncStorage
+    await AsyncStorage.setItem('fridgeItems', JSON.stringify(updatedItems));
+  };
 
   return (
     <View style={styles.container}>
-      <Text>Your fridge</Text>
       <ScrollView>
         {fridgeItems.length > 0 ? (
           fridgeItems.map((item, index) => (
-            <View key={index} style={styles.fridgeItems}>
-              <Text>{item.name}</Text>
+            <View key={index} style={styles.fridgeItemContainer}>
+              <Text style={styles.fridgeItem}>{item.name}</Text>
+              <TouchableOpacity onPress={() => removeItem(index)}>
+                <Text style={styles.removeButton}>X</Text>
+              </TouchableOpacity>
             </View>
           ))
         ) : (
@@ -45,7 +68,7 @@ const FridgePage = ({ navigation }) => {
         </Pressable>
         <Pressable
           style={styles.buttonStyles}
-          onPress={() => navigation.navigate('AddToFridge', { addToFridge: setFridgeItems })} // Pass addToFridge here
+          onPress={() => navigation.navigate('AddToFridge', { addToFridge: setFridgeItems })}
         >
           <Text>Add Ingredient</Text>
         </Pressable>
@@ -60,16 +83,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
-    paddingTop: 40
+    paddingTop: 40,
   },
-  fridgeItems:{
-
+  fridgeItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 5,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  fridgeItem: {
+    fontSize: 16,
+  },
+  removeButton: {
+    color: 'red',
+    fontWeight: 'bold',
+    fontSize: 18,
+    padding: 10
   },
   buttonItems: {
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10
+    marginBottom: 10,
   },
   buttonStyles: {
     justifyContent: 'center',
@@ -84,3 +122,4 @@ const styles = StyleSheet.create({
 });
 
 export default FridgePage;
+

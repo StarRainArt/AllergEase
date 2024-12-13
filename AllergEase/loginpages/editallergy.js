@@ -3,15 +3,9 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable } from 'r
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
+import allergyList from '../allergies';
 
 export default function EditAllergiesPage({ navigation }) {
-  const [fontsLoaded] = useFonts({
-    "Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
-    "DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
-    "DynaPuffMedium": require("../assets/fonts/DynaPuff-Medium.ttf"),
-    "BalooPaaji2": require("../assets/fonts/BalooPaaji2-VariableFont_wght.ttf"),
-  });
-
   const allergiesList = [
     'Gluten', 'Lupine', 'Selderij', 'Ei', 'Vis',
     'Pinda', 'Soja', 'Lactose', 'Schaaldieren',
@@ -65,7 +59,7 @@ export default function EditAllergiesPage({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Select your Allergies</Text>
       <FlatList
-        data={allergiesList}
+        data={allergyList}
         keyExtractor={(item) => item}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
