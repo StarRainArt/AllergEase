@@ -7,7 +7,7 @@ const AddToFridgePage = ({ route }) => {
   const [ingredientName, setIngredientName] = useState('');
   const [hasPermission, setHasPermission] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
-  const { addToFridge } = route.params; // Access addToFridge function from params
+  const { addToFridge } = route.params;
 
   // Request camera permissions
   useEffect(() => {
@@ -71,7 +71,7 @@ const AddToFridgePage = ({ route }) => {
         if (productData.status === 1) {
           // Product found for the barcode
           addToFridge((prevItems) => [...prevItems, { name: productData.product.product_name }]);
-          setIngredientName(''); // Reset the input field
+          setIngredientName('');
         } else {
           Alert.alert("Product Not Found", "No product found for this barcode.");
         }
@@ -90,7 +90,7 @@ const AddToFridgePage = ({ route }) => {
 
           if (matchingIngredient) {
             addToFridge((prevItems) => [...prevItems, { name: matchingIngredient.product_name }]);
-            setIngredientName(''); // Reset the input field
+            setIngredientName('');
           } else {
             Alert.alert("No Exact Match", "We couldn't find an exact match for this ingredient.");
           }
@@ -117,11 +117,10 @@ const AddToFridgePage = ({ route }) => {
       <View style={styles.section}>
         <Text style={styles.title}>Scan Barcode or Add Manually</Text>
 
-        {/* Button to trigger camera */}
         <Pressable
           style={styles.button}
           onPress={() => {
-            setIsScanning(true); // Set isScanning to true to show CameraView
+            setIsScanning(true);
           }}
         >
           <Text style={styles.buttonText}>Scan Barcode</Text>
@@ -132,7 +131,7 @@ const AddToFridgePage = ({ route }) => {
         <CameraView
           style={styles.camera}
           onBarcodeScanned={handleBarCodeScanned}
-          flash="auto" // Adjust other props as needed
+          flash="auto"
           facing="back"
         />
       )}
