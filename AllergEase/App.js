@@ -8,6 +8,7 @@ import RegisterPage from './loginpages/registreren';
 import FridgeStack from './fridgepages/FridgeStack';
 import ShoplistPage from './pages/boodschappen';
 import RecipesPage from './recipes/recipes';
+import FilterRecipes from './recipes/filterRecipes';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';

@@ -1,19 +1,20 @@
 import React, { useCallback, useState } from "react";
 import { View, Text, FlatList, StyleSheet, Image, Pressable, Dimensions } from "react-native";
 import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
 const SPOONACULAR_API_KEY = '20d4411eec5744e79d7906bea977857e';
 const SEARCH = 'https://api.spoonacular.com/recipes/';
 
 export default function RecipesPage({ navigation }) {
-	const recipesPerPage = 10;
-	const maxPages = 2;
+	const recipesPerPage = 20;
+	const maxPages = 1;
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
 	const [isFetchingMore, setIsFetchingMore] = useState(false);
 	const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [] });
-	const [selectedAllergies, setSelectedAllergies] = useState([]);
+	const [allergies, setAllergies] = useState([]);
 	const [fontsLoaded] = useFonts({
 		"Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
 		"DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
@@ -24,9 +25,10 @@ export default function RecipesPage({ navigation }) {
 	const fetchUser = async () => {
 		const userData = await AsyncStorage.getItem('user');
 		const user = JSON.parse(userData);
-		setSelectedAllergies(user.allergies || []);
+		
+		setAllergies(user.allergies);
 	};
-	const getRecipesSearch = async (filter = filters, page = 1) => {
+	const getRecipesSearch = async (filter = filters, page = 1, allergies = []) => {
 		try {
 			let url = `${SEARCH}/complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`;
 			if (filter.query !== null) {
@@ -41,14 +43,14 @@ export default function RecipesPage({ navigation }) {
 			if (filter.ingredients.length) {
 				url += `&includeIngredients=${filter.ingredients.join(",")}`;
 			}
-			if (selectedAllergies.length > 0) {
-				url += `&intolerances=${selectedAllergies.join(",")}`;
+			if (allergies.length > 0) {
+				url += `&intolerances=${allergies.join(",")}`;
 
 			}
 			console.log(url);
 			const response = await fetch(url);
 			const json = await response.json();
-			console.log(json);
+			// console.log(json);
 			setData(prevData => [...prevData, ...json.results]);
 		}
 		catch (error) {
@@ -63,7 +65,8 @@ export default function RecipesPage({ navigation }) {
 		useCallback(() => {
 			setData([]);
 			fetchUser();
-			getRecipesSearch(filters, page);
+			console.log(allergies);
+			getRecipesSearch(filters, page, allergies);
 		}, [filters, page])
 	);
 
