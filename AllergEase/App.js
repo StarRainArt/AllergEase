@@ -7,11 +7,11 @@ import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
 import FridgeStack from './fridgepages/FridgeStack';
 import ShoplistPage from './pages/boodschappen';
-import RecipesPage from './recipes/recipes';
+
 import RecipesPage from './recipes/recipes';
 import FilterRecipes from './recipes/filterRecipes';
-import FridgePage from './fridge';
-import ShoplistPage from './shoplist';
+
+
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';
@@ -96,6 +96,8 @@ export default function App() {
         {/* Pages Accessed from Recipes */}
         <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
 
+        
+        <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
       </Stack.Navigator>

@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from "react";
-import { View, Text, FlatList, StyleSheet, Image, Pressable, Dimensions } from "react-native";
+import { View, Text, FlatList, StyleSheet, Image, Pressable, Dimensions, TouchableOpacity } from "react-native";
 import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
+
 const SPOONACULAR_API_KEY = '20d4411eec5744e79d7906bea977857e';
 const SEARCH = 'https://api.spoonacular.com/recipes/';
 
@@ -26,6 +28,8 @@ export default function RecipesPage({ navigation }) {
 		const user = JSON.parse(userData);
 		setSelectedAllergies(user.allergies || []);
 	};
+
+	// Haal recepten op op basis van filters
 	const getRecipesSearch = async (filter = filters, page = 1) => {
 		try {
 			let url = `${SEARCH}/complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`;
@@ -43,22 +47,18 @@ export default function RecipesPage({ navigation }) {
 			}
 			if (selectedAllergies.length > 0) {
 				url += `&intolerances=${selectedAllergies.join(",")}`;
-
 			}
-			console.log(url);
 			const response = await fetch(url);
 			const json = await response.json();
-			console.log(json);
 			setData(prevData => [...prevData, ...json.results]);
-		}
-		catch (error) {
+		} catch (error) {
 			console.error("Failed to fetch recipe details:", error);
-		}
-		finally {
+		} finally {
 			setLoading(false);
 			setIsFetchingMore(false);
 		}
-	}
+	};
+
 	useFocusEffect(
 		useCallback(() => {
 			setData([]);
@@ -67,6 +67,26 @@ export default function RecipesPage({ navigation }) {
 		}, [filters, page])
 	);
 
+	// Voeg recept toe aan favorieten
+	const addToFavorites = async (recipe) => {
+		try {
+			// Haal de bestaande favorieten op uit AsyncStorage
+			const existingFavorites = await AsyncStorage.getItem('favorites');
+			let favorites = existingFavorites ? JSON.parse(existingFavorites) : [];
+
+			// Voeg het recept toe aan de lijst van favorieten als het nog niet in de lijst staat
+			if (!favorites.some(fav => fav.id === recipe.id)) {
+				favorites.push(recipe);
+				await AsyncStorage.setItem('favorites', JSON.stringify(favorites));  // Sla de favorieten op
+			} else {
+				console.log("Recept is al een favoriet!");
+			}
+		} catch (error) {
+			console.error("Fout bij toevoegen aan favorieten:", error);
+		}
+	};
+
+	// Laad meer recepten wanneer de gebruiker scrolt
 	const loadMoreRecipes = () => {
 		if (!isFetchingMore && page < maxPages) {
 			setIsFetchingMore(true);
@@ -74,110 +94,104 @@ export default function RecipesPage({ navigation }) {
 		}
 	};
 
-	const RenderRecipe = ({ title, image }) => (
-		<View style={[styles.sectionGreen,{ marginBottom: 4,}]}>
-			<Text style={[styles.title, {paddingVertical: 10,fontSize: 20}]}>{title}</Text>
-			{image && <Image source={{ uri: image }} style={recipesStyle.image} />}
+	// Render elke recept
+	const RenderRecipe = ({ recipe }) => (
+		<View style={[styles.sectionGreen, { marginBottom: 4 }]}>
+			<Text style={[styles.title, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
+			{recipe.image && <Image source={{ uri: recipe.image }} style={recipesStyle.image} />}
+			<TouchableOpacity
+				style={styles.favoriteButton}
+				onPress={() => addToFavorites(recipe)}
+			>
+				<Text style={styles.favoriteButtonText}>Add to Favorites</Text>
+			</TouchableOpacity>
+			
 		</View>
 	);
 
-
 	if (loading && page == 1) {
 		return <View>
-			<Text>loading</Text>
-		</View>
+			<Text>Loading...</Text>
+		</View>;
 	}
+
 	return (
 		<View style={styles.background}>
 			<Text style={styles.title}>Recipes</Text>
 			<FlatList
 				data={data}
-				renderItem={({ item }) => <RenderRecipe title={item.title} image={item.image} />}
+				renderItem={({ item }) => <RenderRecipe recipe={item} />}
 				keyExtractor={(item) => item.id.toString()}
 				onEndReached={!filters.query && !filters.diet && !filters.cuisine && filters.ingredients.length < 1 ? null : loadMoreRecipes}
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isFetchingMore ? <Text>Loading...</Text> : null}
 			/>
-			<Pressable style={styles.buttonRed} title="Filter" onPress={() => navigation.navigate('FilterRecipes')}><Text style={styles.redButtonText}>filter</Text></Pressable>
+			<Pressable style={styles.buttonRed} title="Filter" onPress={() => navigation.navigate('FilterRecipes')}><Text style={styles.redButtonText}>Filter</Text></Pressable>
+			<Pressable 
+  style={styles.buttonRed} 
+  onPress={() => navigation.navigate('FavoriteRecipes')}
+>
+  <Text style={styles.redButtonText}>Favoriete</Text>
+</Pressable>
 		</View>
 	);
-
 }
+
 const { width, height } = Dimensions.get('window');
 
-// Styling temporary
 const recipesStyle = StyleSheet.create({
 	container: {
 		flex: 1,
 		marginTop: 3,
 	},
 	image: {
-		width: width*0.8,
+		width: width * 0.8,
 		alignSelf: 'center',
 		height: 100,
 	},
 });
+
 const styles = StyleSheet.create({
 	background: {
 		padding: 30,
 		flex: 1,
 		alignItems: 'center',
 		backgroundColor: "#FFF5E1",
-	  },
-	  title: {
+	},
+	title: {
 		textAlign: "center",
 		fontSize: 40,
 		fontFamily: "DynaPuffMedium",
 		color: "#472D30",
-		paddingVertical: 20
-	  },
-	  sectionGreen: {
+		paddingVertical: 20,
+	},
+	sectionGreen: {
 		backgroundColor: "#C9CBA3",
 		color: "#472D30",
 		borderRadius: 15,
-		padding: 5
-	  },
-	  sectionYellow: {
-		backgroundColor: "#FFE1A8",
-		color: "#472D30",
-		borderRadius: 15,
-		padding: 5
-	  },
-	  buttonRed: {
+		padding: 5,
+	},
+	buttonRed: {
 		backgroundColor: "#E26D5C",
 		width: "60%",
 		borderRadius: 15,
-		paddingVertical: 5
-	  },
-	  buttonGreen: {
-		backgroundColor: "#C9CBA3",
-		width: "60%",
-		borderRadius: 15,
-		paddingVertical: 5
-	  },
-	  greenButtonText: {
-		color: "#472D30",
-		fontSize: 25,
-		fontFamily: "DynaPuff",
-		textAlign: "center",
-	  },
-	  redButtonText: {
+		paddingVertical: 5,
+	},
+	redButtonText: {
 		color: "#FFF5E1",
 		fontSize: 25,
 		fontFamily: "DynaPuff",
 		textAlign: "center",
-	  },
-	  input: {
-		backgroundColor: "#FFE1A8",
-		color: "#472D30",
-		paddingLeft: 15,
-		paddingTop: 5,
-		paddingBottom: 0,
-		width: "95%",
-		borderRadius: 15,
-		marginBottom: 20,
-		fontSize: 25,
-		fontFamily: "BalooPaaji2",
-		textAlignVertical: "bottom"
-	  },
-	});
+	},
+	favoriteButton: {
+		backgroundColor: "#E26D5C",
+		padding: 10,
+		borderRadius: 5,
+		marginTop: 10,
+	},
+	favoriteButtonText: {
+		color: "#FFF5E1",
+		fontSize: 16,
+		textAlign: "center",
+	},
+});
