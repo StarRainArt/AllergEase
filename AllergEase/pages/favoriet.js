@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, StyleSheet, Pressable } from "react-native";
+import { View, Text, FlatList, Image, StyleSheet, Pressable, Button } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "../style";
 
@@ -18,6 +18,20 @@ const FavoriteRecipesScreen = ({ navigation }) => {
 		}
 	};
 
+	// Function to remove an item from favorites
+	const removeFavorite = async (id) => {
+		try {
+			// Filter out the item with the matching id
+			const updatedFavorites = favorites.filter(item => item.id !== id);
+			
+			// Update the state and AsyncStorage
+			setFavorites(updatedFavorites);
+			await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+		} catch (error) {
+			console.error("Failed to remove favorite:", error);
+		}
+	};
+
 	useEffect(() => {
 		fetchFavorites();  // Laad favorieten wanneer de pagina wordt geladen
 	}, []);
@@ -27,6 +41,9 @@ const FavoriteRecipesScreen = ({ navigation }) => {
 		<View style={favs.recipeContainer}>
 			<Text style={favs.recipeTitle}>{recipe.title}</Text>
 			{recipe.image && <Image source={{ uri: recipe.image }} style={favs.recipeImage} />}
+			<Pressable style={styles.buttonRed} onPress={() => removeFavorite(recipe.id)}>
+				<Text style={[styles.redButtonText, {fontSize: 18}]}>Remove Favorite</Text>
+			</Pressable>
 		</View>
 	);
 
@@ -37,9 +54,10 @@ const FavoriteRecipesScreen = ({ navigation }) => {
                 <Text style={styles.title}>Recipes</Text>
                 <View></View>
             </View>
-			<Text style={styles.kopje}>Favorites</Text>
+			<Text style={[styles.kopje, {marginBottom: 10}]}>Favorites</Text>
 			{favorites.length > 0 ? (
 				<FlatList
+					style={{width: "100%"}}
 					data={favorites}
 					renderItem={({ item }) => <RenderFavorite recipe={item} />}
 					keyExtractor={(item) => item.id.toString()}
@@ -61,6 +79,7 @@ const favs = StyleSheet.create({
     },
 	recipeContainer: {
 		backgroundColor: "#C9CBA3",
+		width: "100%",
 		padding: 10,
 		borderRadius: 15,
 		marginBottom: 15,
@@ -75,13 +94,13 @@ const favs = StyleSheet.create({
 		width: "100%",
 		height: 150,
 		borderRadius: 10,
-		marginTop: 10,
+		marginVertical: 10,
 	},
 	text: {
 		fontSize: 20,
 		fontFamily: "BalooPaaji2",
 		textAlign: "center"
-	  }
+	}
 });
 
 export default FavoriteRecipesScreen;

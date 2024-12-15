@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Button, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // import useNavigation
+import styles from "../style";
+import { useFonts } from "expo-font";
 
 const ShoppingListScreen = () => {
   const navigation = useNavigation(); // gebruik de hook
@@ -29,34 +31,31 @@ const ShoppingListScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Boodschappenlijstje</Text>
-      <View style={styles.inputContainer}>
+    <View style={styles.background}>
+      <Text style={styles.title}>Shoppinglist</Text>
+      <View style={list.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, {fontSize: 18, flex: 1}]}
           placeholder="Voeg een item toe..."
           value={newItem}
           onChangeText={setNewItem}
         />
-        <TouchableOpacity style={styles.addButton} onPress={addItem}>
-          <Text style={styles.addButtonText}>+</Text>
+        <TouchableOpacity style={[styles.buttonRed, list.addButton]} onPress={addItem}>
+          <Text style={[styles.redButtonText, {fontSize: 30}]}>+</Text>
         </TouchableOpacity>
       </View>
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <TouchableOpacity
-              style={[styles.item, item.bought && styles.boughtItem]}
-              onPress={() => toggleBought(item.id)}
-            >
-              <Text style={[styles.itemText, item.bought && styles.boughtText]}>
+          <View style={[styles.sectionGreen, list.itemContainer, item.bought && list.boughtItem]}>
+            <TouchableOpacity onPress={() => toggleBought(item.id)}>
+              <Text style={[list.itemText, item.bought && list.boughtText]}>
                 {item.name}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => removeItem(item.id)}>
-              <Text style={styles.deleteText}>✕</Text>
+              <Text style={list.deleteText}>✕</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -68,37 +67,18 @@ const ShoppingListScreen = () => {
 
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f9fa',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
+const list = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
+    height: 50,
     marginBottom: 20,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
+    width: "100%"
   },
   addButton: {
     marginLeft: 10,
-    backgroundColor: '#28a745',
-    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 15,
-    paddingVertical: 10,
   },
   addButtonText: {
     color: '#fff',
@@ -109,34 +89,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 15,
-    borderRadius: 8,
     marginBottom: 10,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    width: "100%"
   },
   item: {
     flex: 1,
   },
   boughtItem: {
-    backgroundColor: '#d4edda',
-    borderRadius: 8,
-    padding: 10,
+    backgroundColor: '#FFE1A8',
+    borderRadius: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 20
   },
   itemText: {
     fontSize: 18,
-    color: '#333',
+    color: '#472D30',
   },
   boughtText: {
     textDecorationLine: 'line-through',
-    color: '#6c757d',
+    color: '#806266',
   },
   deleteText: {
-    color: '#dc3545',
+    color: '#E26D5C',
     fontSize: 20,
     marginLeft: 10,
   },
