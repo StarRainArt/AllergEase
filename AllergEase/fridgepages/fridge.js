@@ -88,7 +88,8 @@ const fridge = StyleSheet.create({
     width: "80%",
     borderRadius: 10,
     paddingVertical: 10,
-    marginHorizontal: 5,
+    marginTop: 10,
+    marginBottom: 10
   },
   itemsContainer: {
     width: "90%"

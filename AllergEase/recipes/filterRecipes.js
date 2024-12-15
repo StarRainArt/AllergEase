@@ -39,13 +39,13 @@ export default function FilterRecipes({ onFilter, navigation }) {
             />
             <TextInput
                 style={[styles.input, filter.input]}
-                placeholder="diet"
+                placeholder="Diet"
                 value={diet}
                 onChangeText={setDiet}
             />
             <TextInput
                 style={[styles.input, filter.input]}
-                placeholder="cuisine"
+                placeholder="Cuisine"
                 value={cuisine}
                 onChangeText={setCuisine}
             />

@@ -67,13 +67,13 @@ export default function EditUserInfoPage({ navigation }) {
       {/* Section for Editing Username and Email */}
       <Text style={styles.title}>Edit Profile</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 20}]}
         value={username}
         onChangeText={setUsername}
         placeholder="Enter your username"
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 20}]}
         value={email}
         onChangeText={setEmail}
         placeholder="Enter your email"
@@ -85,14 +85,14 @@ export default function EditUserInfoPage({ navigation }) {
       <Text style={[styles.kopje, {marginBottom: 10}]}>Change Password</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 20}]}
         value={newPassword}
         onChangeText={setNewPassword}
         placeholder="Enter new password"
         secureTextEntry
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 20}]}
         value={confirmNewPassword}
         onChangeText={setConfirmNewPassword}
         placeholder="Confirm new password"

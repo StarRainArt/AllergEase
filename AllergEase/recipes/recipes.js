@@ -168,7 +168,7 @@ export default function RecipesPage({ navigation }) {
 					<Text style={[styles.redButtonText, recipes.buttonText]}>Filter</Text>
 				</Pressable>
 				<Pressable style={[styles.buttonRed, recipes.button]} onPress={() => navigation.navigate('FavoriteRecipes')}>
-					<Text style={[styles.redButtonText, recipes.buttonText]}>Favoriete</Text>
+					<Text style={[styles.redButtonText, recipes.buttonText]}>Favorites</Text>
 				</Pressable>
 			</View>
 		</View>

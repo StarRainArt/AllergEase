@@ -32,11 +32,11 @@ const ShoppingListScreen = () => {
 
   return (
     <View style={styles.background}>
-      <Text style={styles.title}>Shoppinglist</Text>
+      <Text style={styles.title}>My Shoppinglist</Text>
       <View style={list.inputContainer}>
         <TextInput
           style={[styles.input, {fontSize: 18, flex: 1}]}
-          placeholder="Voeg een item toe..."
+          placeholder="Add an item..."
           value={newItem}
           onChangeText={setNewItem}
         />

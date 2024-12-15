@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
 import allergyList from '../allergies';
+import styles from "../style";
 
 export default function EditAllergiesPage({ navigation }) {
   const allergiesList = [
@@ -39,9 +40,9 @@ export default function EditAllergiesPage({ navigation }) {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.allergyText}>{item}</Text>
-      <TouchableOpacity onPress={() => handleToggle(item)} style={styles.checkbox}>
+    <View style={allergy.item}>
+      <Text style={allergy.allergyText}>{item}</Text>
+      <TouchableOpacity onPress={() => handleToggle(item)} style={allergy.checkbox}>
         {selectedAllergies.includes(item) ? (
           <>
             <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: 0.7, top: 0.7 }} />
@@ -56,35 +57,22 @@ export default function EditAllergiesPage({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={styles.background}>
       <Text style={styles.title}>Select your Allergies</Text>
       <FlatList
         data={allergyList}
         keyExtractor={(item) => item}
         renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
+        contentContainerStyle={allergy.listContainer}
       />
-      <Pressable style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>SAVE</Text>
+      <Pressable style={allergy.saveButton} onPress={handleSave}>
+        <Text style={allergy.saveButtonText}>SAVE</Text>
       </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFF5E1',
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 35,
-    fontFamily: 'DynaPuffMedium',
-    color: '#472D30',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
+const allergy = StyleSheet.create({
   listContainer: {
     width: '100%',
     alignItems: 'center',
@@ -118,7 +106,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingVertical: 5,
     paddingHorizontal: 50,
-    marginTop: 20,
+    marginTop: 10,
+    marginBottom: 10
   },
   saveButtonText: {
     fontFamily: 'DynaPuff',
