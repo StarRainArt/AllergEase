@@ -5,12 +5,17 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
-import RecipesPage from './recipes';
 import FridgeStack from './fridgepages/FridgeStack';
 import ShoplistPage from './pages/boodschappen';
+
+import RecipesPage from './recipes/recipes';
+import FilterRecipes from './recipes/filterRecipes';
+
+
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';
+import FavoriteRecipesScreen from './pages/favoriet';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -88,6 +93,11 @@ export default function App() {
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         {/* <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />    */}
 
+        {/* Pages Accessed from Recipes */}
+        <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
+
+        
+        <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
       </Stack.Navigator>

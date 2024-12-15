@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Button, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // import useNavigation
 
 const ShoppingListScreen = () => {
+  const navigation = useNavigation(); // gebruik de hook
   const [items, setItems] = useState([
-    { id: '1', name: 'Tomaten', bought: false },
-    { id: '2', name: 'Pasta', bought: false },
+    
   ]);
   const [newItem, setNewItem] = useState('');
 
@@ -60,9 +61,12 @@ const ShoppingListScreen = () => {
           </View>
         )}
       />
+      
     </View>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
