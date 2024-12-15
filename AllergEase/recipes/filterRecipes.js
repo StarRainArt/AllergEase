@@ -7,6 +7,7 @@ export default function FilterRecipes({ onFilter }) {
     const [ingredients, setIngredients] = useState([]);
     const [diet, setDiet] = useState("");
     const [cuisine, setCuisine] = useState("");
+    const [maxReadyTime, setMaxReadyTime] = useState("");
 
     const handleAddIngredient = () => {
         if (ingredient.trim()) {
@@ -19,7 +20,7 @@ export default function FilterRecipes({ onFilter }) {
         setIngredients(ingredients.filter((_, i) => i !== index));
     };
     const handleFilter = () => {
-        onFilter({ query, ingredients, diet, cuisine });
+        onFilter({ query, ingredients, diet, cuisine, maxReadyTime });
     };
 
     return (

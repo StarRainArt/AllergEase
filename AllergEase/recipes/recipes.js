@@ -13,7 +13,7 @@ export default function RecipesPage({ navigation }) {
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
 	const [isFetchingMore, setIsFetchingMore] = useState(false);
-	const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [] });
+	const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [], maxReadyTime: null });
 	const [allergies, setAllergies] = useState([]);
 	const [fontsLoaded] = useFonts({
 		"Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
@@ -39,6 +39,9 @@ export default function RecipesPage({ navigation }) {
 			}
 			if (filter.diet) {
 				url += `&diet=${filter.diet}`;
+			}
+			if (filter.maxReadyTime) {
+				url += `&maxReadyTime=${filter.maxReadyTime}`;
 			}
 			if (filter.ingredients.length) {
 				url += `&includeIngredients=${filter.ingredients.join(",")}`;
