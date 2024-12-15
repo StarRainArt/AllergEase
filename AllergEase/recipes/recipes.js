@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, Image, Pressable, Dimensions, Touchab
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
+import styles from "../style";
 
 const SPOONACULAR_API_KEY = '20d4411eec5744e79d7906bea977857e';
 const SEARCH = 'https://api.spoonacular.com/recipes/';
@@ -28,6 +29,14 @@ export default function RecipesPage({ navigation }) {
 		const user = JSON.parse(userData);
 		setSelectedAllergies(user.allergies || []);
 	};
+
+	const dummyRecipe = [
+		{
+		  id: "dummy-1",
+		  title: "Dummy Recipe",
+		  image: "https://via.placeholder.com/150",
+		},
+	  ];
 
 	// Haal recepten op op basis van filters
 	const getRecipesSearch = async (filter = filters, page = 1) => {
@@ -96,16 +105,15 @@ export default function RecipesPage({ navigation }) {
 
 	// Render elke recept
 	const RenderRecipe = ({ recipe }) => (
-		<View style={[styles.sectionGreen, { marginBottom: 4 }]}>
-			<Text style={[styles.title, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
-			{recipe.image && <Image source={{ uri: recipe.image }} style={recipesStyle.image} />}
+		<View style={[styles.sectionGreen, { marginBottom: 10 }]}>
+			<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
+			{recipe.image && <Image source={{ uri: recipe.image }} style={recipe.image} />}
 			<TouchableOpacity
-				style={styles.favoriteButton}
+				style={[styles.buttonRed, recipes.favButton]}
 				onPress={() => addToFavorites(recipe)}
 			>
-				<Text style={styles.favoriteButtonText}>Add to Favorites</Text>
+				<Text style={[styles.redButtonText, recipes.favButtonText]}>Add to Favorites</Text>
 			</TouchableOpacity>
-			
 		</View>
 	);
 
@@ -119,6 +127,7 @@ export default function RecipesPage({ navigation }) {
 		<View style={styles.background}>
 			<Text style={styles.title}>Recipes</Text>
 			<FlatList
+				style={{width: "100%"}}
 				data={data}
 				renderItem={({ item }) => <RenderRecipe recipe={item} />}
 				keyExtractor={(item) => item.id.toString()}
@@ -126,72 +135,41 @@ export default function RecipesPage({ navigation }) {
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isFetchingMore ? <Text>Loading...</Text> : null}
 			/>
-			<Pressable style={styles.buttonRed} title="Filter" onPress={() => navigation.navigate('FilterRecipes')}><Text style={styles.redButtonText}>Filter</Text></Pressable>
-			<Pressable 
-  style={styles.buttonRed} 
-  onPress={() => navigation.navigate('FavoriteRecipes')}
->
-  <Text style={styles.redButtonText}>Favoriete</Text>
-</Pressable>
+			<View style={recipes.container}>
+				<Pressable style={[styles.buttonRed, recipes.button]} title="Filter" onPress={() => navigation.navigate('FilterRecipes')}>
+					<Text style={[styles.redButtonText, recipes.buttonText]}>Filter</Text>
+				</Pressable>
+				<Pressable style={[styles.buttonRed, recipes.button]} onPress={() => navigation.navigate('FavoriteRecipes')}>
+					<Text style={[styles.redButtonText, recipes.buttonText]}>Favoriete</Text>
+				</Pressable>
+			</View>
 		</View>
 	);
 }
 
 const { width, height } = Dimensions.get('window');
 
-const recipesStyle = StyleSheet.create({
+const recipes = StyleSheet.create({
 	container: {
-		flex: 1,
-		marginTop: 3,
+		paddingVertical: 10,
+		gap: 10
 	},
 	image: {
 		width: width * 0.8,
 		alignSelf: 'center',
 		height: 100,
 	},
-});
-
-const styles = StyleSheet.create({
-	background: {
-		padding: 30,
-		flex: 1,
-		alignItems: 'center',
-		backgroundColor: "#FFF5E1",
-	},
-	title: {
-		textAlign: "center",
-		fontSize: 40,
-		fontFamily: "DynaPuffMedium",
-		color: "#472D30",
-		paddingVertical: 20,
-	},
-	sectionGreen: {
-		backgroundColor: "#C9CBA3",
-		color: "#472D30",
-		borderRadius: 15,
-		padding: 5,
-	},
-	buttonRed: {
-		backgroundColor: "#E26D5C",
-		width: "60%",
-		borderRadius: 15,
-		paddingVertical: 5,
-	},
-	redButtonText: {
-		color: "#FFF5E1",
-		fontSize: 25,
-		fontFamily: "DynaPuff",
-		textAlign: "center",
-	},
-	favoriteButton: {
-		backgroundColor: "#E26D5C",
+	favButton: {
 		padding: 10,
-		borderRadius: 5,
 		marginTop: 10,
 	},
-	favoriteButtonText: {
-		color: "#FFF5E1",
+	favButtonText: {
 		fontSize: 16,
-		textAlign: "center",
+	},
+	button: {
+		width: "100%"
+	},
+	buttonText: {
+		fontSize: 18
 	},
 });
