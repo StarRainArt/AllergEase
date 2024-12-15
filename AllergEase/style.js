@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     background: {
       padding: 30,
+      paddingTop: 50,
       flex: 1,
       alignItems: 'center',
       backgroundColor: "#FFF5E1",
@@ -61,9 +62,9 @@ const styles = StyleSheet.create({
       paddingTop: 5,
       paddingBottom: 0,
       width: "95%",
+      height: 50,
       borderRadius: 15,
       marginBottom: 20,
-      fontSize: 25,
       fontFamily: "BalooPaaji2",
       textAlignVertical: "bottom"
     },
