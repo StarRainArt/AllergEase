@@ -28,6 +28,16 @@ function ProfileStack() {
   );
 }
 
+function RecipesStack() {
+  const RecipesStack = createStackNavigator();
+  return (
+    <RecipesStack.Navigator screenOptions={{ headerShown: false }}>
+      <RecipesStack.Screen name="RecipesPage" component={RecipesPage} />
+      <RecipesStack.Screen name="FilterRecipes" component={FilterRecipes} />
+    </RecipesStack.Navigator>
+  )
+}
+
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -69,7 +79,7 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="recipes" component={RecipesPage} />
+      <Tab.Screen name="recipes" component={RecipesStack} />
       <Tab.Screen name="fridge" component={FridgeStack} />
       <Tab.Screen name="shoplist" component={ShoplistPage} />
       <Tab.Screen name="Profile" component={ProfileStack} />
@@ -88,9 +98,6 @@ export default function App() {
         {/* Pages accessed from Profile */}
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         {/* <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />    */}
-
-        {/* Pages Accessed from Recipes */}
-        <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
 
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
