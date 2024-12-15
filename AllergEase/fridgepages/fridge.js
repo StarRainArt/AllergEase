@@ -1,39 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Text, ScrollView, View, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { Text, ScrollView, View, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FridgePage = ({ navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
 
-  useEffect(() => {
-    const fetchFridgeItems = async () => {
+  // Functie om koelkastitems op te halen
+  const fetchFridgeItems = async () => {
+    try {
       const storedItems = await AsyncStorage.getItem('fridgeItems');
       if (storedItems) {
         setFridgeItems(JSON.parse(storedItems));
+      } else {
+        setFridgeItems([]);
       }
-    };
+    } catch (error) {
+      console.error('Fout bij ophalen van fridgeItems:', error);
+    }
+  };
 
+  // Haal gegevens op bij laden van de pagina
+  useEffect(() => {
     fetchFridgeItems();
   }, []);
 
-  // Save fridge items to AsyncStorage whenever the list changes
+  // Luister naar veranderingen in AsyncStorage
   useEffect(() => {
-    const saveFridgeItems = async () => {
-      await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
-    };
+    const interval = setInterval(fetchFridgeItems, 500); // Controleer elke halve seconde
+    return () => clearInterval(interval); // Opruimen wanneer component wordt ontkoppeld
+  }, []);
 
-    if (fridgeItems.length > 0) {
-      saveFridgeItems();
-    }
-  }, [fridgeItems]);
-
-  // Remove an item from the fridge
+  // Verwijder een item uit de koelkast
   const removeItem = async (index) => {
     const updatedItems = fridgeItems.filter((_, i) => i !== index);
     setFridgeItems(updatedItems);
 
-    // Save the updated list to AsyncStorage
-    await AsyncStorage.setItem('fridgeItems', JSON.stringify(updatedItems));
+    try {
+      await AsyncStorage.setItem('fridgeItems', JSON.stringify(updatedItems));
+    } catch (error) {
+      console.error('Fout bij verwijderen van item uit fridgeItems:', error);
+    }
   };
 
   return (
@@ -44,39 +50,38 @@ const FridgePage = ({ navigation }) => {
             <View key={index} style={styles.fridgeItemContainer}>
               <Text style={styles.fridgeItem}>{item.name}</Text>
               <TouchableOpacity onPress={() => removeItem(index)}>
-                <Text style={styles.removeButton}>X</Text>
+                <Text style={styles.removeButton}>✔</Text>
               </TouchableOpacity>
             </View>
           ))
         ) : (
-          <Text>No ingredients in your fridge.</Text>
+          <Text style={styles.noItemsText}>No ingredients in your fridge.</Text>
         )}
       </ScrollView>
 
       <View style={styles.buttonItems}>
-        <Pressable
+        <TouchableOpacity
           style={styles.buttonStyles}
           onPress={() => navigation.navigate('Recipes')}
         >
           <Text>Recipes</Text>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.buttonStyles}
           onPress={() => navigation.navigate('Shopping List')}
         >
           <Text>Shopping List</Text>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.buttonStyles}
           onPress={() => navigation.navigate('AddToFridge', { addToFridge: setFridgeItems })}
         >
           <Text>Add Ingredient</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
