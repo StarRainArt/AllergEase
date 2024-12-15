@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+import { Picker } from '@react-native-picker/picker';
+import { allergyList } from "../allergies";
+import { dietList } from "../diets";
+import { cuisineList } from "../cuisines";
 
-export default function FilterRecipes({ onFilter }) {
+export default function FilterRecipes({ route }) {
+    const { onFilter } = route.params;
     const [query, setQuery] = useState("");
     const [ingredient, setIngredient] = useState("");
     const [ingredients, setIngredients] = useState([]);
@@ -32,16 +36,25 @@ export default function FilterRecipes({ onFilter }) {
                 value={query}
                 onChangeText={setQuery}
             />
-            <TextInput
-                placeholder="diet"
-                value={diet}
-                onChangeText={setDiet}
-            />
-            <TextInput
-                placeholder="cuisine"
-                value={cuisine}
-                onChangeText={setCuisine}
-            />
+            <Picker
+                selectedValue={diet}
+                onValueChange={(itemValue) => setDiet(itemValue)}
+            >
+                <Picker.Item label="Select diet" value="" />
+                {dietList.map((diet) => (
+                    <Picker.Item key={diet} value={diet} label={diet} />
+                ))}
+            </Picker>
+            <Picker
+                selectedValue={cuisine}
+                onValueChange={(itemValue) => setCuisine(itemValue)}
+            >
+                <Picker.Item label="Select cuisine" value="" />
+                {cuisineList.map((cuisine) => (
+                    <Picker.Item key={cuisine} value={cuisine} label={cuisine} />
+                ))}
+            </Picker>
+           
             <View>
                 <TextInput
                     placeholder="Add ingredient"
