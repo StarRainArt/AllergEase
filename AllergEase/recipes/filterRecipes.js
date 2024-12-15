@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 export default function FilterRecipes({ onFilter }) {
     const [query, setQuery] = useState("");
