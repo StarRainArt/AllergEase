@@ -95,9 +95,8 @@ export default function App() {
 
         {/* Pages Accessed from Recipes */}
         <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
-
-        
         <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
+        
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
       </Stack.Navigator>

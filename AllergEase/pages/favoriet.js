@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, StyleSheet } from "react-native";
+import { View, Text, FlatList, Image, StyleSheet, Pressable } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import styles from "../style";
 
-const FavoriteRecipesScreen = () => {
+const FavoriteRecipesScreen = ({ navigation }) => {
 	const [favorites, setFavorites] = useState([]);
 
 	// Haal de favorieten op uit AsyncStorage
@@ -23,15 +24,20 @@ const FavoriteRecipesScreen = () => {
 
 	// Render elke favoriet
 	const RenderFavorite = ({ recipe }) => (
-		<View style={styles.recipeContainer}>
-			<Text style={styles.recipeTitle}>{recipe.title}</Text>
-			{recipe.image && <Image source={{ uri: recipe.image }} style={styles.recipeImage} />}
+		<View style={favs.recipeContainer}>
+			<Text style={favs.recipeTitle}>{recipe.title}</Text>
+			{recipe.image && <Image source={{ uri: recipe.image }} style={favs.recipeImage} />}
 		</View>
 	);
 
 	return (
-		<View style={styles.container}>
-			<Text style={styles.title}>Your Favorite Recipes</Text>
+		<View style={styles.background}>
+			<View style={favs.inARow}>
+                <Pressable onPress={() => navigation.navigate('Main', { screen: 'recipes' })}><Text style={styles.title}>{'<'}</Text></Pressable>
+                <Text style={styles.title}>Recipes</Text>
+                <View></View>
+            </View>
+			<Text style={styles.kopje}>Favorites</Text>
 			{favorites.length > 0 ? (
 				<FlatList
 					data={favorites}
@@ -39,26 +45,20 @@ const FavoriteRecipesScreen = () => {
 					keyExtractor={(item) => item.id.toString()}
 				/>
 			) : (
-				<Text style={styles.noFavoritesText}>You don't have any favorite recipes yet.</Text>
+				<Text style={favs.text}>You don't have any favorite recipes yet.</Text>
 			)}
 		</View>
 	);
 };
 
 // Stijlen voor de favorietenpagina
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 20,
-		backgroundColor: "#FFF5E1",
-	},
-	title: {
-		fontSize: 30,
-		fontFamily: "DynaPuffMedium",
-		color: "#472D30",
-		textAlign: "center",
-		marginBottom: 20,
-	},
+const favs = StyleSheet.create({
+	inARow: {
+        flexDirection: "row", 
+        alignItems: 'center', 
+        justifyContent: "space-between", 
+        width: "100%"
+    },
 	recipeContainer: {
 		backgroundColor: "#C9CBA3",
 		padding: 10,
@@ -77,11 +77,11 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		marginTop: 10,
 	},
-	noFavoritesText: {
-		fontSize: 18,
-		color: "#472D30",
-		textAlign: "center",
-	},
+	text: {
+		fontSize: 20,
+		fontFamily: "BalooPaaji2",
+		textAlign: "center"
+	  }
 });
 
 export default FavoriteRecipesScreen;

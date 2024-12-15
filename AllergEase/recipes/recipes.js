@@ -17,6 +17,7 @@ export default function RecipesPage({ navigation }) {
 	const [isFetchingMore, setIsFetchingMore] = useState(false);
 	const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [] });
 	const [selectedAllergies, setSelectedAllergies] = useState([]);
+	const [apiAvailable, setApiAvailable] = useState(true);
 	const [fontsLoaded] = useFonts({
 		"Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
 		"DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
@@ -34,34 +35,60 @@ export default function RecipesPage({ navigation }) {
 		{
 		  id: "dummy-1",
 		  title: "Dummy Recipe",
-		  image: "https://via.placeholder.com/150",
+		  image: "https://png.pngtree.com/element_our/png/20180930/food-icon-design-vector-png_120564.jpg",
 		},
-	  ];
+		{
+			id: "dummy-2",
+			title: "Dummy Recipe 2",
+			image: "https://png.pngtree.com/element_our/png/20180930/food-icon-design-vector-png_120564.jpg",
+		},
+		{
+			id: "dummy-3",
+			title: "Dummy Recipe 3",
+			image: "https://png.pngtree.com/element_our/png/20180930/food-icon-design-vector-png_120564.jpg",
+		},
+	];
+
+	const checkApiAvailability = async () => {
+		try {
+		  	const testUrl = `${SEARCH}complexSearch?apiKey=${SPOONACULAR_API_KEY}`;
+		  	const response = await fetch(testUrl);
+		  	if (response.ok) {
+				setApiAvailable(true);
+		  	}
+			else {
+				throw new Error("API unavailable");
+		  	}
+		} 
+		catch (error) {
+		  	console.warn("API is unavailable, using dummy recipes:", error);
+		  	setApiAvailable(false);
+		}
+	};
 
 	// Haal recepten op op basis van filters
 	const getRecipesSearch = async (filter = filters, page = 1) => {
+		if (!apiAvailable) {
+			setData(dummyRecipe); // Use dummy recipe if API is unavailable
+			setLoading(false);
+			return;
+		}
+		
 		try {
 			let url = `${SEARCH}/complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`;
-			if (filter.query !== null) {
-				url += `&query=${filter.query}`;
-			}
-			if (filter.cuisine) {
-				url += `&cuisine=${filter.cuisine}`;
-			}
-			if (filter.diet) {
-				url += `&diet=${filter.diet}`;
-			}
-			if (filter.ingredients.length) {
-				url += `&includeIngredients=${filter.ingredients.join(",")}`;
-			}
-			if (selectedAllergies.length > 0) {
-				url += `&intolerances=${selectedAllergies.join(",")}`;
-			}
+			if (filter.query !== null) url += `&query=${filter.query}`;
+			if (filter.cuisine) url += `&cuisine=${filter.cuisine}`;
+			if (filter.diet) url += `&diet=${filter.diet}`;
+			if (filter.ingredients.length) url += `&includeIngredients=${filter.ingredients.join(",")}`;
+			if (selectedAllergies.length > 0) url += `&intolerances=${selectedAllergies.join(",")}`;
+			
 			const response = await fetch(url);
 			const json = await response.json();
-			setData(prevData => [...prevData, ...json.results]);
+			const results = json.results || []; // Safeguard against undefined results
+			setData((prevData) => [...prevData, ...results]);
 		} catch (error) {
-			console.error("Failed to fetch recipe details:", error);
+			console.error("Failed to fetch recipes:", error);
+			setData(dummyRecipe); // Use dummy recipe on error
 		} finally {
 			setLoading(false);
 			setIsFetchingMore(false);
@@ -72,6 +99,7 @@ export default function RecipesPage({ navigation }) {
 		useCallback(() => {
 			setData([]);
 			fetchUser();
+			checkApiAvailability();
 			getRecipesSearch(filters, page);
 		}, [filters, page])
 	);
@@ -106,16 +134,16 @@ export default function RecipesPage({ navigation }) {
 	// Render elke recept
 	const RenderRecipe = ({ recipe }) => (
 		<View style={[styles.sectionGreen, { marginBottom: 10 }]}>
-			<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
-			{recipe.image && <Image source={{ uri: recipe.image }} style={recipe.image} />}
-			<TouchableOpacity
-				style={[styles.buttonRed, recipes.favButton]}
-				onPress={() => addToFavorites(recipe)}
-			>
-				<Text style={[styles.redButtonText, recipes.favButtonText]}>Add to Favorites</Text>
-			</TouchableOpacity>
+		  <Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
+		  {recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
+		  <TouchableOpacity
+			style={[styles.buttonRed, recipes.favButton]}
+			onPress={() => addToFavorites(recipe)}
+		  >
+			<Text style={[styles.redButtonText, recipes.favButtonText]}>Add to Favorites</Text>
+		  </TouchableOpacity>
 		</View>
-	);
+	);	  
 
 	if (loading && page == 1) {
 		return <View>
@@ -150,26 +178,30 @@ export default function RecipesPage({ navigation }) {
 const { width, height } = Dimensions.get('window');
 
 const recipes = StyleSheet.create({
-	container: {
-		paddingVertical: 10,
-		gap: 10
-	},
+	
 	image: {
 		width: width * 0.8,
 		alignSelf: 'center',
 		height: 100,
 	},
 	favButton: {
-		padding: 10,
+		paddingVertical: 10,
 		marginTop: 10,
+		borderRadius: 7
 	},
 	favButtonText: {
 		fontSize: 16,
 	},
 	button: {
-		width: "100%"
+		width: "100%",
+		paddingVertical: 10
 	},
 	buttonText: {
-		fontSize: 18
+		fontSize: 20
 	},
+	container: {
+		paddingVertical: 10,
+		gap: 10,
+		width: "100%"
+	}
 });

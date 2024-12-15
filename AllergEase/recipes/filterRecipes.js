@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, FlatList, TouchableOpacity, Pressable, StyleSheet } from "react-native";
 import styles from "../style";
 
 export default function FilterRecipes({ onFilter, navigation }) {
@@ -25,12 +25,12 @@ export default function FilterRecipes({ onFilter, navigation }) {
 
     return (
         <View style={styles.background}>
-            <View style={regist.inARow}>
-            <Pressable onPress={() => navigation.navigate('recipes')}><Text style={styles.title}>{'<'}</Text></Pressable>
-            <Text style={styles.title}>Recipes</Text>
-            <View></View>
-        </View>
-            <Text style={styles.kopje}>Filter</Text>
+            <View style={filter.inARow}>
+                <Pressable onPress={() => navigation.navigate('Main', { screen: 'recipes' })}><Text style={styles.title}>{'<'}</Text></Pressable>
+                <Text style={styles.title}>Recipes</Text>
+                <View></View>
+            </View>
+            <Text style={[styles.kopje, {marginBottom: 20}]}>Filter</Text>
             <TextInput
                 style={[styles.input, filter.input]}
                 placeholder="Name"
@@ -56,8 +56,8 @@ export default function FilterRecipes({ onFilter, navigation }) {
                     value={ingredient}
                     onChangeText={setIngredient}
                 />
-                <Pressable style={styles.buttonGreen} onPress={handleAddIngredient}>
-                    <Text style={styles.greenButtonText}>Add</Text>
+                <Pressable style={[styles.buttonGreen, filter.button]} onPress={handleAddIngredient}>
+                    <Text style={[styles.greenButtonText, filter.buttonText]}>Add</Text>
                 </Pressable>
                 <FlatList
                     data={ingredients}
@@ -71,10 +71,9 @@ export default function FilterRecipes({ onFilter, navigation }) {
                     )}
                     keyExtractor= {(item, index) => index.toString()}
                 />
-                <Pressable style={styles.buttonRed} onPress={handleFilter}>
-                    <Text style={styles.redButtonText}>Filter</Text>
+                <Pressable style={[styles.buttonRed, filter.button]} onPress={handleFilter}>
+                    <Text style={[styles.redButtonText, filter.buttonText]}>Filter</Text>
                 </Pressable>
-                <Button title="Filter" onPress={handleFilter} />
             </View>
         </View>
     )
@@ -88,6 +87,13 @@ const filter = StyleSheet.create({
         width: "100%"
     },
     input: {
-        width: "100%"
-    }
+        width: "100%",
+        fontSize: 18
+    },
+    button: {
+        marginBottom: 20
+    },
+    buttonText: {
+        fontSize: 20
+    },
 });
