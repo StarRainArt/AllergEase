@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const FridgePage = ({ navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
 
-  // Functie om koelkastitems op te halen
+
   const fetchFridgeItems = async () => {
     try {
       const storedItems = await AsyncStorage.getItem('fridgeItems');
@@ -19,18 +19,17 @@ const FridgePage = ({ navigation }) => {
     }
   };
 
-  // Haal gegevens op bij laden van de pagina
   useEffect(() => {
     fetchFridgeItems();
   }, []);
 
-  // Luister naar veranderingen in AsyncStorage
+ 
   useEffect(() => {
-    const interval = setInterval(fetchFridgeItems, 500); // Controleer elke halve seconde
-    return () => clearInterval(interval); // Opruimen wanneer component wordt ontkoppeld
+    const interval = setInterval(fetchFridgeItems, 500);
+    return () => clearInterval(interval); 
   }, []);
 
-  // Verwijder een item uit de koelkast
+  
   const removeItem = async (index) => {
     const updatedItems = fridgeItems.filter((_, i) => i !== index);
     setFridgeItems(updatedItems);
