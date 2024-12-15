@@ -50,10 +50,8 @@ export default function RecipesPage({ navigation }) {
 				url += `&intolerances=${allergies.join(",")}`;
 
 			}
-			console.log(url);
 			const response = await fetch(url);
 			const json = await response.json();
-			// console.log(json);
 			setData(prevData => [...prevData, ...json.results]);
 		}
 		catch (error) {
@@ -80,6 +78,12 @@ export default function RecipesPage({ navigation }) {
 		}
 	};
 
+	const onFilter = (newFilters) => {
+		setFilters(newFilters);
+		setPage(1);
+		setData([]);
+	};
+
 	const RenderRecipe = ({ title, image }) => (
 		<View style={[styles.sectionGreen,{ marginBottom: 4,}]}>
 			<Text style={[styles.title, {paddingVertical: 10,fontSize: 20}]}>{title}</Text>
@@ -104,7 +108,7 @@ export default function RecipesPage({ navigation }) {
 				onEndReachedThreshold={0.5}
 				ListFooterComponent={isFetchingMore ? <Text>Loading...</Text> : null}
 			/>
-			<Pressable style={styles.buttonRed} title="Filter" onPress={() => navigation.navigate('FilterRecipes')}><Text style={styles.redButtonText}>filter</Text></Pressable>
+			<Pressable style={styles.buttonRed} title="Filter" onPress={() => navigation.navigate('FilterRecipes', { onFilter })}><Text style={styles.redButtonText}>filter</Text></Pressable>
 		</View>
 	);
 

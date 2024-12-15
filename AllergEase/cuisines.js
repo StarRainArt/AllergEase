@@ -1,4 +1,4 @@
-const cuisine = [
+export const cuisineList = [
     'African',
     'Asian',
     'American',
@@ -27,5 +27,3 @@ const cuisine = [
     'Thai',
     'Vietnamese'
 ]
-
-export default cuisine;
