@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from "../style";
 
 const ShoppingListScreen = () => {
@@ -75,15 +76,16 @@ const ShoppingListScreen = () => {
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
+        style={{ width: "100%" }}
         renderItem={({ item }) => (
           <View style={[styles.sectionGreen, list.itemContainer, item.bought && list.boughtItem]}>
             <TouchableOpacity onPress={() => toggleBought(item.id)}>
-              <Text style={[list.itemText, item.bought && list.boughtText]}>
+              <Text style={[list.itemText]}>
                 {item.name}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => toggleBought(item.id)}>
-              <Text style={styles.checkmark}>✔</Text>
+              <View style={list.checkbox}></View>
             </TouchableOpacity>
           </View>
         )}
@@ -112,32 +114,24 @@ const list = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
     marginBottom: 10,
-    width: "100%"
+    width: "100%",
+    justifyContent: "space-between"
   },
   item: {
     flex: 1,
   },
-  boughtItem: {
-    backgroundColor: '#FFE1A8',
-    borderRadius: 15,
-    paddingVertical: 15,
-    paddingHorizontal: 20
-  },
   itemText: {
-    fontSize: 18,
-    color: '#472D30',
-  },
-  boughtText: {
-    textDecorationLine: 'line-through',
-    color: '#806266',
-  },
-  deleteText: {
-    color: '#E26D5C',
     fontSize: 20,
-    color: '#C9CBA3',
+    color: '#472D30',
+    fontFamily: "BalooPaaji2",
   },
+  checkbox: {
+    width: 35,
+    height: 35,
+    backgroundColor: "#FFF5E1",
+    borderRadius: 7
+  }
 });
 
 export default ShoppingListScreen;
