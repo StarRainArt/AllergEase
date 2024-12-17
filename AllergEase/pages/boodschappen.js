@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
-import { View, Button, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // import useNavigation
-import styles from "../style";
-import { useFonts } from "expo-font";
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ShoppingListScreen = () => {
-  const navigation = useNavigation(); // gebruik de hook
-  const [items, setItems] = useState([
-    
-  ]);
+  const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState('');
+
+  // Haal boodschappenlijst op bij het laden van de app
+  useEffect(() => {
+    const fetchItems = async () => {
+      const storedItems = await AsyncStorage.getItem('shoppingList');
+      if (storedItems) {
+        setItems(JSON.parse(storedItems));
+      }
+    };
+    fetchItems();
+  }, []);
+
+  // Sla boodschappenlijst op bij elke wijziging
+  useEffect(() => {
+    const saveItems = async () => {
+      await AsyncStorage.setItem('shoppingList', JSON.stringify(items));
+    };
+    saveItems();
+  }, [items]);
 
   const addItem = () => {
     if (newItem.trim() !== '') {
@@ -18,16 +32,29 @@ const ShoppingListScreen = () => {
     }
   };
 
-  const toggleBought = (id) => {
-    setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, bought: !item.bought } : item
-      )
+  const toggleBought = async (id) => {
+    const updatedItems = items.map((item) =>
+      item.id === id ? { ...item, bought: !item.bought } : item
     );
-  };
+    setItems(updatedItems);
 
-  const removeItem = (id) => {
-    setItems(items.filter((item) => item.id !== id));
+    // Verplaats naar fridge als gekocht
+    const boughtItem = updatedItems.find((item) => item.id === id && item.bought);
+    if (boughtItem) {
+      try {
+        const storedFridgeItems = await AsyncStorage.getItem('fridgeItems');
+        const fridgeItems = storedFridgeItems ? JSON.parse(storedFridgeItems) : [];
+        fridgeItems.push({ name: boughtItem.name });
+
+        // Opslaan in AsyncStorage
+        await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
+
+        // Verwijder uit boodschappenlijst
+        setItems(updatedItems.filter((item) => item.id !== id));
+      } catch (error) {
+        console.error('Fout bij verplaatsen naar fridge:', error);
+      }
+    }
   };
 
   return (
@@ -54,13 +81,12 @@ const ShoppingListScreen = () => {
                 {item.name}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => removeItem(item.id)}>
-              <Text style={list.deleteText}>✕</Text>
+            <TouchableOpacity onPress={() => toggleBought(item.id)}>
+              <Text style={styles.checkmark}>✔</Text>
             </TouchableOpacity>
           </View>
         )}
       />
-      
     </View>
   );
 };
@@ -81,13 +107,11 @@ const list = StyleSheet.create({
     paddingHorizontal: 15,
   },
   addButtonText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#FFF',
   },
   itemContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 15,
     marginBottom: 10,
@@ -113,7 +137,7 @@ const list = StyleSheet.create({
   deleteText: {
     color: '#E26D5C',
     fontSize: 20,
-    marginLeft: 10,
+    color: '#C9CBA3',
   },
 });
 

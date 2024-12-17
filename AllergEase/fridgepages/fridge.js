@@ -1,40 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Text, ScrollView, View, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { Text, ScrollView, View, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "../style";
 
 const FridgePage = ({ navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
 
-  useEffect(() => {
-    const fetchFridgeItems = async () => {
+
+  const fetchFridgeItems = async () => {
+    try {
       const storedItems = await AsyncStorage.getItem('fridgeItems');
       if (storedItems) {
         setFridgeItems(JSON.parse(storedItems));
+      } else {
+        setFridgeItems([]);
       }
-    };
+    } catch (error) {
+      console.error('Fout bij ophalen van fridgeItems:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchFridgeItems();
   }, []);
 
-  // Save fridge items to AsyncStorage whenever the list changes
+ 
   useEffect(() => {
-    const saveFridgeItems = async () => {
-      await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
-    };
+    const interval = setInterval(fetchFridgeItems, 500);
+    return () => clearInterval(interval); 
+  }, []);
 
-    if (fridgeItems.length > 0) {
-      saveFridgeItems();
-    }
-  }, [fridgeItems]);
-
-  // Remove an item from the fridge
+  
   const removeItem = async (index) => {
     const updatedItems = fridgeItems.filter((_, i) => i !== index);
     setFridgeItems(updatedItems);
 
-    // Save the updated list to AsyncStorage
-    await AsyncStorage.setItem('fridgeItems', JSON.stringify(updatedItems));
+    try {
+      await AsyncStorage.setItem('fridgeItems', JSON.stringify(updatedItems));
+    } catch (error) {
+      console.error('Fout bij verwijderen van item uit fridgeItems:', error);
+    }
   };
 
   return (
