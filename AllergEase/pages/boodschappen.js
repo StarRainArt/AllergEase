@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import styles from "../style";
 
 const ShoppingListScreen = () => {
   const [items, setItems] = useState([]);
@@ -90,8 +91,6 @@ const ShoppingListScreen = () => {
     </View>
   );
 };
-
-
 
 const list = StyleSheet.create({
   inputContainer: {
