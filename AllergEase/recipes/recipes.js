@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
 import styles from "../style";
-const SPOONACULAR_API_KEY = '698e1cea042340ba930b76e05c681e9c';
+const SPOONACULAR_API_KEY = '8b5ba339a9c944b5bebe6274e6044b5c';
 const SEARCH = 'https://api.spoonacular.com/recipes';
 
 export default function RecipesPage({ navigation }) {
@@ -72,7 +72,7 @@ export default function RecipesPage({ navigation }) {
 			if (filter.cuisine) url += `&cuisine=${filter.cuisine}`;
 			if (filter.diet) url += `&diet=${filter.diet}`;
 			if (filter.ingredients.length) url += `&includeIngredients=${filter.ingredients.join(",")}`;
-			if (filter.maxReadyTime) url += `&maxReadyTime=${filter.maxReadyTime}`;
+			if (filter.maxReadyTime && filter.maxReadyTime !== 120) url += `&maxReadyTime=${filter.maxReadyTime}`;
 			if (allergies.length > 0) url += `&intolerances=${allergies.join(",")}`;
 			const response = await fetch(url);
 			if (!response.ok) {
@@ -132,19 +132,19 @@ export default function RecipesPage({ navigation }) {
 	const RenderRecipe = ({ recipe, favorites }) => {
 		let id = recipe.id;
 		return (
-			<View style={[styles.sectionGreen, { marginBottom: 10 }]}>
-				<TouchableOpacity onPress={() => navigation.navigate('RecipePage', { id })}>
-					<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
-					{recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={recipes.favButton}
+			<TouchableOpacity  style={[recipes.recipe,{ marginBottom: 10 }]} onPress={() => navigation.navigate('RecipePage', { id })}>
+		
+				
+				<TouchableOpacity  
+					style={[recipes.favButton, { maxWidth: 50}]}
 					onPress={() => toggleFavorite(recipe)}
 				>
 					<Icon name={favorites.some(i => i.id === recipe.id) ? 'star' : 'star-border'} size={50} color="#E26D5C" />
 				</TouchableOpacity>
-			</View>
+				
+					<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20, width: '80%'}]}>{recipe.title}</Text>
+					{recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
+			</TouchableOpacity>
 		)
 	};
 
@@ -167,9 +167,10 @@ export default function RecipesPage({ navigation }) {
 				ListFooterComponent={isFetchingMore ? <Text>Loading...</Text> : null}
 			/>
 
-			<View style={recipes.container}>
-				<Pressable style={[styles.buttonRed, recipes.button]} title="Filter" onPress={() => navigation.navigate('FilterRecipes', { onFilter })}>
-					<Text style={[styles.redButtonText, recipes.buttonText]}>Filter</Text>
+			<View style={recipes.recipesnav}>
+				<Pressable style={[styles.buttonRed, recipes.button, {flexDirection: "row"}]} title="Filter" onPress={() => navigation.navigate('FilterRecipes', { onFilter })}>
+					<Icon style={{width: '40%'}} name="search" size={30} color="#FFF5E1" />
+					<Text style={[styles.redButtonText, {width: '40%'},recipes.buttonText]}>Filter</Text>
 				</Pressable>
 				<Pressable style={[styles.buttonRed, recipes.button]} onPress={() => navigation.navigate('FavoriteRecipes')}>
 					<Text style={[styles.redButtonText, recipes.buttonText]}>Favorites</Text>
@@ -187,6 +188,9 @@ const recipes = StyleSheet.create({
 		width: width * 0.8,
 		alignSelf: 'center',
 		height: 100,
+		margin: 0,
+		padding: 0,
+		borderRadius: 15,
 	},
 	favButton: {
 		height: 50,
@@ -196,15 +200,25 @@ const recipes = StyleSheet.create({
 	},
 
 	button: {
-		width: "100%",
+		width: "40%",
 		paddingVertical: 10
 	},
 	buttonText: {
 		fontSize: 20
 	},
-	container: {
-		paddingVertical: 10,
-		gap: 10,
-		width: "100%"
+	recipesnav: {
+		paddingVertical: 3,
+		width: "100%",
+		flexDirection: "row",
+		justifyContent: "space-between"
+	},
+	recipe: {
+		flexWrap: 'wrap',
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		backgroundColor: "#C9CBA3",
+		padding: 10,
+		borderRadius: 15,
 	}
 });

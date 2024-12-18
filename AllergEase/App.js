@@ -37,6 +37,7 @@ function RecipesStack() {
       <RecipesStack.Screen name="RecipesPage" component={RecipesPage} />
       <RecipesStack.Screen name="FilterRecipes" component={FilterRecipes} />
       <RecipesStack.Screen name="RecipePage" component={RecipePage} />
+      <RecipesStack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
     </RecipesStack.Navigator>
   )
 }
@@ -101,10 +102,6 @@ export default function App() {
         {/* Pages accessed from Profile */}
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         {/* <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />    */}
-
-        {/* Pages Accessed from Recipes */}
-        <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
-        <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
 
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />

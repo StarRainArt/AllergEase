@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Pressable, StyleSheet } from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import Icon from 'react-native-vector-icons/MaterialIcons'
 import Slider from '@react-native-community/slider';
 import { allergyList } from "../allergies";
 import { dietList } from "../diets";
@@ -37,11 +38,12 @@ export default function FilterRecipes({ route, navigation }) {
         navigation.goBack();
     };
 
+  
 
     return (
         <View style={styles.background}>
             <View style={filter.inARow}>
-                <Pressable onPress={() => navigation.navigate('Main', { screen: 'recipes' })}><Text style={styles.title}>{'<'}</Text></Pressable>
+                <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.title}>{'<'}</Text></TouchableOpacity>
                 <Text style={styles.title}>Recipes</Text>
                 <View></View>
             </View>
@@ -52,14 +54,17 @@ export default function FilterRecipes({ route, navigation }) {
                 value={query}
                 onChangeText={setQuery}
             />
-            <Slider
+            <Text style={[styles.kopje, {marginBottom: 10}]}>Time limit</Text>
+            {maxReadyTime < 120 ? <Text>{maxReadyTime}</Text> : <Text>120+</Text>}
+            <Slider style={{width: "100%", height: 40}}
                 minimumValue={0}
                 maximumValue={120}
                 step={5}
                 value={maxReadyTime}
-                onValueChange={handleSilderChange}
+                onSlidingComplete={handleSilderChange}
                />
             <Picker
+                style={[styles.input, filter.input]}
                 selectedValue={diet}
                 onValueChange={(itemValue) => setDiet(itemValue)}
             >
@@ -69,6 +74,7 @@ export default function FilterRecipes({ route, navigation }) {
                 ))}
             </Picker>
             <Picker
+                style={[styles.input, filter.input]}
                 selectedValue={cuisine}
                 onValueChange={(itemValue) => setCuisine(itemValue)}
             >
@@ -100,10 +106,11 @@ export default function FilterRecipes({ route, navigation }) {
                     )}
                     keyExtractor= {(item, index) => index.toString()}
                 />
-                <Pressable style={[styles.buttonRed, filter.button]} onPress={handleFilter}>
-                    <Text style={[styles.redButtonText, filter.buttonText]}>Filter</Text>
-                </Pressable>
+               
             </View>
+            <TouchableOpacity style={filter.icon} onPress={handleFilter}>
+                    <Icon name="search" color="#FFF5E1" size={90} style={[{padding: 0},{margin:0}]}/>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -115,9 +122,20 @@ const filter = StyleSheet.create({
         justifyContent: "space-between", 
         width: "100%"
     },
+    icon: {
+        backgroundColor: '#E26D5C',
+        borderRadius: 20,
+        marginTop: 50,
+        padding: 0,
+        alignSelf: 'flex-end',
+        height: 80,
+        width: 80,
+    },
     input: {
         width: "100%",
-        fontSize: 18
+        backgroundColor: "#C9CBA3",
+        fontSize: 18,
+        color: "#FFF5E1",
     },
     button: {
         marginBottom: 20

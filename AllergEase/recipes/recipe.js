@@ -1,10 +1,11 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, Image, Button, Dimensions, ScrollView } from "react-native";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import styles from "../style";
-const SPOONACULAR_API_KEY = '698e1cea042340ba930b76e05c681e9c';
+const SPOONACULAR_API_KEY = '8b5ba339a9c944b5bebe6274e6044b5c';
 const SEARCH = 'https://api.spoonacular.com/recipes';
 
 export default function RecipePage({ navigation, route }) {
@@ -12,6 +13,7 @@ export default function RecipePage({ navigation, route }) {
     const [recipe, setRecipe] = useState({});
     const [loading, setLoading] = useState(true);
     const [allergies, setAllergies] = useState([]);
+    const [favorites, setFavorites] = useState([]);
     const [fontsLoaded] = useFonts({
         "Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
         "DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
@@ -19,7 +21,26 @@ export default function RecipePage({ navigation, route }) {
         "BalooPaaji2": require("../assets/fonts/BalooPaaji2-VariableFont_wght.ttf"),
     });
 
- 
+    const fetchFavorites = async () => {
+        const favoritesData = await AsyncStorage.getItem('favorites');
+        let favorites = JSON.parse(favoritesData) || [];
+
+        setFavorites(favorites);
+    };
+
+    const toggleFavorite = async (recipe) => {
+		const favoritesData = await AsyncStorage.getItem('favorites');
+		let favorites = favoritesData ? JSON.parse(favoritesData) : [];
+
+		if (!favorites.some(i => i.id === recipe.id)) {
+			favorites.push(recipe);
+		} else {
+			favorites = favorites.filter(i => i.id !== recipe.id);
+		}
+
+		await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+		fetchFavorites(favorites);
+	};
 
     const fetchUser = async () => {
         const userData = await AsyncStorage.getItem('user');
@@ -43,7 +64,7 @@ export default function RecipePage({ navigation, route }) {
     const ingredientsList = () => {
         return recipe.extendedIngredients.map((ingredient) => {
             return (
-                <Text key={ingredient.id} style={styles.ingredient}>
+                <Text key={ingredient.id} style={recipeStyle.paragraph}>
                     {ingredient.original}
                 </Text>
             );
@@ -52,7 +73,7 @@ export default function RecipePage({ navigation, route }) {
     const instructionsList = () => {
         return recipe.analyzedInstructions[0].steps.map((step) => {
             return (
-                <Text key={step.number} style={styles.instruction}>
+                <Text key={step.number} style={recipeStyle.paragraph}>
                     {step.number}. {step.step}
                 </Text>
             );
@@ -61,6 +82,7 @@ export default function RecipePage({ navigation, route }) {
     useFocusEffect(
         useCallback(() => {
             fetchUser();
+            fetchFavorites();
             getRecipe(id);
     }, [id])
 );
@@ -70,26 +92,28 @@ export default function RecipePage({ navigation, route }) {
     }
     return (
         <View style={styles.background}>
-            <Button
-                title="Back"
-                onPress={() => navigation.navigate('RecipesPage')}
-                buttonStyle={styles.button}
-            />
+            <View style={recipeStyle.inARow}>
+            <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.title}>{'<'}</Text></TouchableOpacity>
             <Text style={styles.title}>Recipes</Text>
-           
-            <ScrollView >
+            <View/>
+            </View>
+            <ScrollView style={[styles.sectionGreen, {marginBottom: 10}]} >
+            <View style={recipeStyle.inARow}>
+            <TouchableOpacity onPress={() => toggleFavorite(recipe)}><Icon name={favorites.some(i => i.id === recipe.id) ? 'star' : 'star-border'} size={60} color="#E26D5C"/></TouchableOpacity>
+            <Text style={[recipeStyle.title]}>{recipe.title}</Text>
+            </View>
             <Image source={{ uri: recipe.image }} style={recipeStyle.image} />
-            <Text style={styles.title}>{recipe.title}</Text>
-            <Text style={styles.subtitle}>Ingredients:</Text>
-            <View style={recipeStyle.ingredientsContainer}>
+     
+            <Text style={[styles.title, recipeStyle.subtitle]}>Ingredients</Text>
+            <View style={recipeStyle.paragraphContainer}>
                 {ingredientsList()}
             </View>
-            <Text style={styles.subtitle}>Instructions:</Text>
+            <Text style={[styles.title, recipeStyle.subtitle]}>Instructions</Text>
             {recipe.analyzedInstructions.length > 0 ? (
-            <View style={recipeStyle.instructionsContainer}>
+            <View style={recipeStyle.paragraphContainer}>
                 {instructionsList()}
             </View>) : (
-            <Text style={recipeStyle.instructions}>{recipe.instructions}</Text>
+            <Text style={recipeStyle.paragraph}>{recipe.instructions}</Text>
                )}
             </ScrollView>
         </View>
@@ -100,8 +124,33 @@ const {width, height} = Dimensions.get('window');
 
 const recipeStyle = StyleSheet.create({
     image: {
-		width: width*0.8,
+		width: width*0.7,
 		alignSelf: 'center',
-		height: 100,
+		height: 150,
+        borderRadius: 15,
 	},
+    inARow: {
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: "space-between",
+        width: "100%"
+    },
+    paragraph: {
+        fontSize: 18,
+        fontFamily: "BalooPaaji2",
+        color: "#FFF5E1",
+        fontWeight: "bold",
+        paddingBottom: 5
+    },
+    title: {
+        fontSize: 23,
+        fontFamily: "DynaPuff",
+        color: "#472D30",
+        paddingVertical: 0
+    },
+    subtitle: {
+        fontSize: 22,
+        color: "#FFF5E1",
+        paddingVertical: 3
+    },
 });
