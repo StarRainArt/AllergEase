@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
 import styles from "../style";
 const SPOONACULAR_API_KEY = '698e1cea042340ba930b76e05c681e9c';
-const SEARCH = 'https://api.spoonacular.com/recipes;
+const SEARCH = 'https://api.spoonacular.com/recipes';
 
 export default function RecipesPage({ navigation }) {
 	const recipesPerPage = 20;
@@ -16,7 +16,7 @@ export default function RecipesPage({ navigation }) {
 	const [isFetchingMore, setIsFetchingMore] = useState(false);
 	const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [], maxReadyTime: null });
 	const [allergies, setAllergies] = useState([]);
-  const [apiAvailable, setApiAvailable] = useState(true);
+	const [apiAvailable, setApiAvailable] = useState(true);
 
 	const [fontsLoaded] = useFonts({
 		"Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
@@ -28,16 +28,16 @@ export default function RecipesPage({ navigation }) {
 	const fetchUser = async () => {
 		const userData = await AsyncStorage.getItem('user');
 		const user = JSON.parse(userData);
-		
+
 		setAllergies(user.allergies);
 	};
 
 
 	const dummyRecipe = [
 		{
-		  id: "dummy-1",
-		  title: "Dummy Recipe",
-		  image: "https://png.pngtree.com/element_our/png/20180930/food-icon-design-vector-png_120564.jpg",
+			id: "dummy-1",
+			title: "Dummy Recipe",
+			image: "https://png.pngtree.com/element_our/png/20180930/food-icon-design-vector-png_120564.jpg",
 		},
 		{
 			id: "dummy-2",
@@ -51,23 +51,6 @@ export default function RecipesPage({ navigation }) {
 		},
 	];
 
-	const checkApiAvailability = async () => {
-		try {
-		  	const testUrl = `${SEARCH}complexSearch?apiKey=${SPOONACULAR_API_KEY}`;
-		  	const response = await fetch(testUrl);
-		  	if (response.ok) {
-				setApiAvailable(true);
-		  	}
-			else {
-				throw new Error("API unavailable");
-		  	}
-		} 
-		catch (error) {
-		  	console.warn("API is unavailable, using dummy recipes:", error);
-		  	setApiAvailable(false);
-		}
-	};
-
 	// Haal recepten op op basis van filters
 	const getRecipesSearch = async (filter = filters, page = 1, allergies = []) => {
 		if (!apiAvailable) {
@@ -75,17 +58,19 @@ export default function RecipesPage({ navigation }) {
 			setLoading(false);
 			return;
 		}
-		
+
 		try {
 			let url = `${SEARCH}/complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`;
 			if (filter.query !== null) url += `&query=${filter.query}`;
 			if (filter.cuisine) url += `&cuisine=${filter.cuisine}`;
 			if (filter.diet) url += `&diet=${filter.diet}`;
 			if (filter.ingredients.length) url += `&includeIngredients=${filter.ingredients.join(",")}`;
-			if (selectedAllergies.length > 0) url += `&intolerances=${selectedAllergies.join(",")}`;
-      if (filter.maxReadyTime) url += `&maxReadyTime=${filter.maxReadyTime}`;
+			if (filter.maxReadyTime) url += `&maxReadyTime=${filter.maxReadyTime}`;
 			if (allergies.length > 0) url += `&intolerances=${allergies.join(",")}`;
 			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error("Failed to fetch recipes");
+			}
 			const json = await response.json();
 			const results = json.results || []; // Safeguard against undefined results
 			setData((prevData) => [...prevData, ...results]);
@@ -102,7 +87,6 @@ export default function RecipesPage({ navigation }) {
 		useCallback(() => {
 			setData([]);
 			fetchUser();
-      checkApiAvailability();
 			getRecipesSearch(filters, page, allergies);
 		}, [filters, page])
 	);
@@ -142,20 +126,22 @@ export default function RecipesPage({ navigation }) {
 	};
 
 	// Render elke recept
-	const RenderRecipe = ({ recipe }) => (
+	const RenderRecipe = ({ recipe }) =>{
+		let id = recipe.id;
+		return (
 		<View style={[styles.sectionGreen, { marginBottom: 10 }]}>
-      <TouchableOpacity onPress={() => navigation.navigate('RecipePage', { recipe.id })}>
-		  <Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
-		  {recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
-      </TouchableOpacity>
-		  <TouchableOpacity
-			style={[styles.buttonRed, recipes.favButton]}
-			onPress={() => addToFavorites(recipe)}
-		  >
-			<Text style={[styles.redButtonText, recipes.favButtonText]}>Add to Favorites</Text>
-		  </TouchableOpacity>
+			<TouchableOpacity onPress={() => navigation.navigate('RecipePage', { id })}>
+				<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
+				{recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
+			</TouchableOpacity>
+			<TouchableOpacity
+				style={[styles.buttonRed, recipes.favButton]}
+				onPress={() => addToFavorites(recipe)}
+			>
+				<Text style={[styles.redButtonText, recipes.favButtonText]}>Add to Favorites</Text>
+			</TouchableOpacity>
 		</View>
-	);	  
+	)};
 
 	if (loading && page == 1) {
 		return <View>
@@ -167,7 +153,7 @@ export default function RecipesPage({ navigation }) {
 		<View style={styles.background}>
 			<Text style={styles.title}>Recipes</Text>
 			<FlatList
-				style={{width: "100%"}}
+				style={{ width: "100%" }}
 				data={data}
 				renderItem={({ item }) => <RenderRecipe recipe={item} />}
 				keyExtractor={(item) => item.id.toString()}
@@ -177,7 +163,7 @@ export default function RecipesPage({ navigation }) {
 			/>
 
 			<View style={recipes.container}>
-				<Pressable style={[styles.buttonRed, recipes.button]} title="Filter" onPress={() => navigation.navigate('FilterRecipes', { onFilter})}>
+				<Pressable style={[styles.buttonRed, recipes.button]} title="Filter" onPress={() => navigation.navigate('FilterRecipes', { onFilter })}>
 					<Text style={[styles.redButtonText, recipes.buttonText]}>Filter</Text>
 				</Pressable>
 				<Pressable style={[styles.buttonRed, recipes.button]} onPress={() => navigation.navigate('FavoriteRecipes')}>
@@ -191,7 +177,7 @@ export default function RecipesPage({ navigation }) {
 const { width, height } = Dimensions.get('window');
 
 const recipes = StyleSheet.create({
-	
+
 	image: {
 		width: width * 0.8,
 		alignSelf: 'center',
