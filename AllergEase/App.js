@@ -7,11 +7,9 @@ import LoginPage from './loginpages/inloggen';
 import RegisterPage from './loginpages/registreren';
 import FridgeStack from './fridgepages/FridgeStack';
 import ShoplistPage from './pages/boodschappen';
-
 import RecipesPage from './recipes/recipes';
 import FilterRecipes from './recipes/filterRecipes';
-
-
+import RecipePage from './recipes/recipe';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';
@@ -30,6 +28,17 @@ function ProfileStack() {
       <ProfileStack.Screen name="EditAllergies" component={EditAllergiesPage} />
     </ProfileStack.Navigator>
   );
+}
+
+function RecipesStack() {
+  const RecipesStack = createStackNavigator();
+  return (
+    <RecipesStack.Navigator screenOptions={{ headerShown: false }}>
+      <RecipesStack.Screen name="RecipesPage" component={RecipesPage} />
+      <RecipesStack.Screen name="FilterRecipes" component={FilterRecipes} />
+      <RecipesStack.Screen name="RecipePage" component={RecipePage} />
+    </RecipesStack.Navigator>
+  )
 }
 
 function MainTabs() {
@@ -73,7 +82,7 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="recipes" component={RecipesPage} />
+      <Tab.Screen name="recipes" component={RecipesStack} />
       <Tab.Screen name="fridge" component={FridgeStack} />
       <Tab.Screen name="shoplist" component={ShoplistPage} />
       <Tab.Screen name="Profile" component={ProfileStack} />
@@ -96,7 +105,7 @@ export default function App() {
         {/* Pages Accessed from Recipes */}
         <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
         <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
-        
+
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
       </Stack.Navigator>
