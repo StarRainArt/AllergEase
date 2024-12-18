@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
 import allergyList from '../allergies';
 import styles from "../style";
 
@@ -45,10 +45,6 @@ export default function EditAllergiesPage({ navigation }) {
       <TouchableOpacity onPress={() => handleToggle(item)} style={allergy.checkbox}>
         {selectedAllergies.includes(item) ? (
           <>
-            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: 0.7, top: 0.7 }} />
-            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: 0.7, top: -0.7 }} />
-            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: -0.7, top: 0.7 }} />
-            <Icon name="check" size={30} color="#472D30" style={{ position: 'absolute', left: -0.7, top: -0.7 }} />
             <Icon name="check" size={30} color="#472D30" />
           </>
         ) : null}
