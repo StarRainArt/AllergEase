@@ -9,6 +9,7 @@ import FridgeStack from './fridgepages/FridgeStack';
 import ShoplistPage from './pages/boodschappen';
 import RecipesPage from './recipes/recipes';
 import FilterRecipes from './recipes/filterRecipes';
+import RecipePage from './recipes/recipe';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';
@@ -34,6 +35,7 @@ function RecipesStack() {
     <RecipesStack.Navigator screenOptions={{ headerShown: false }}>
       <RecipesStack.Screen name="RecipesPage" component={RecipesPage} />
       <RecipesStack.Screen name="FilterRecipes" component={FilterRecipes} />
+      <RecipesStack.Screen name="RecipePage" component={RecipePage} />
     </RecipesStack.Navigator>
   )
 }

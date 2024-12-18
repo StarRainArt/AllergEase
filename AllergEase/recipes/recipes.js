@@ -3,8 +3,8 @@ import { View, Text, FlatList, StyleSheet, Image, Pressable, Dimensions } from "
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
-const SPOONACULAR_API_KEY = '20d4411eec5744e79d7906bea977857e';
-const SEARCH = 'https://api.spoonacular.com/recipes/';
+const SPOONACULAR_API_KEY = '698e1cea042340ba930b76e05c681e9c';
+const SEARCH = 'https://api.spoonacular.com/recipes';
 
 export default function RecipesPage({ navigation }) {
 	const recipesPerPage = 20;
@@ -28,6 +28,9 @@ export default function RecipesPage({ navigation }) {
 		
 		setAllergies(user.allergies);
 	};
+
+
+
 	const getRecipesSearch = async (filter = filters, page = 1, allergies = []) => {
 		try {
 			let url = `${SEARCH}/complexSearch?number=${recipesPerPage}&offset=${(page - 1) * recipesPerPage}&apiKey=${SPOONACULAR_API_KEY}`;
@@ -50,6 +53,7 @@ export default function RecipesPage({ navigation }) {
 				url += `&intolerances=${allergies.join(",")}`;
 
 			}
+			console.log(url);
 			const response = await fetch(url);
 			const json = await response.json();
 			setData(prevData => [...prevData, ...json.results]);
@@ -62,6 +66,7 @@ export default function RecipesPage({ navigation }) {
 			setIsFetchingMore(false);
 		}
 	}
+
 	useFocusEffect(
 		useCallback(() => {
 			setData([]);
@@ -84,11 +89,11 @@ export default function RecipesPage({ navigation }) {
 		setData([]);
 	};
 
-	const RenderRecipe = ({ title, image }) => (
-		<View style={[styles.sectionGreen,{ marginBottom: 4,}]}>
+	const RenderRecipe = ({ title, image, id }) => (
+		<Pressable style={[styles.sectionGreen,{ marginBottom: 4,}]} onPress={() => navigation.navigate('RecipePage', { id })}>
 			<Text style={[styles.title, {paddingVertical: 10,fontSize: 20}]}>{title}</Text>
 			{image && <Image source={{ uri: image }} style={recipesStyle.image} />}
-		</View>
+		</Pressable>
 	);
 
 
@@ -102,7 +107,7 @@ export default function RecipesPage({ navigation }) {
 			<Text style={styles.title}>Recipes</Text>
 			<FlatList
 				data={data}
-				renderItem={({ item }) => <RenderRecipe title={item.title} image={item.image} />}
+				renderItem={({ item }) => <RenderRecipe title={item.title} image={item.image} id={item.id} />}
 				keyExtractor={(item) => item.id.toString()}
 				onEndReached={!filters.query && !filters.diet && !filters.cuisine && filters.ingredients.length < 1 ? null : loadMoreRecipes}
 				onEndReachedThreshold={0.5}
