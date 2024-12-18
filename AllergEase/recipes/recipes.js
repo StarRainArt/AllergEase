@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { View, Text, FlatList, StyleSheet, Image, Pressable, Dimensions, TouchableOpacity } from "react-native";
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,7 +18,7 @@ export default function RecipesPage({ navigation }) {
 	const [filters, setFilters] = useState({ query: null, cuisine: null, diet: null, ingredients: [], maxReadyTime: null });
 	const [allergies, setAllergies] = useState([]);
 	const [apiAvailable, setApiAvailable] = useState(true);
-
+	const [favorites, setFavorites] = useState([]);
 	const [fontsLoaded] = useFonts({
 		"Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
 		"DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
@@ -32,6 +33,12 @@ export default function RecipesPage({ navigation }) {
 		setAllergies(user.allergies);
 	};
 
+	const fetchFavorites = async () => {
+		const favoritesData = await AsyncStorage.getItem('favorites');
+		let favorites = JSON.parse(favoritesData) || [];
+
+		setFavorites(favorites);
+	};
 
 	const dummyRecipe = [
 		{
@@ -85,29 +92,25 @@ export default function RecipesPage({ navigation }) {
 
 	useFocusEffect(
 		useCallback(() => {
+			fetchFavorites();
 			setData([]);
 			fetchUser();
 			getRecipesSearch(filters, page, allergies);
 		}, [filters, page])
 	);
 
-	// Voeg recept toe aan favorieten
-	const addToFavorites = async (recipe) => {
-		try {
-			// Haal de bestaande favorieten op uit AsyncStorage
-			const existingFavorites = await AsyncStorage.getItem('favorites');
-			let favorites = existingFavorites ? JSON.parse(existingFavorites) : [];
+	const toggleFavorite = async (recipe) => {
+		const favoritesData = await AsyncStorage.getItem('favorites');
+		let favorites = favoritesData ? JSON.parse(favoritesData) : [];
 
-			// Voeg het recept toe aan de lijst van favorieten als het nog niet in de lijst staat
-			if (!favorites.some(fav => fav.id === recipe.id)) {
-				favorites.push(recipe);
-				await AsyncStorage.setItem('favorites', JSON.stringify(favorites));  // Sla de favorieten op
-			} else {
-				console.log("Recept is al een favoriet!");
-			}
-		} catch (error) {
-			console.error("Fout bij toevoegen aan favorieten:", error);
+		if (!favorites.some(i => i.id === recipe.id)) {
+			favorites.push(recipe);
+		} else {
+			favorites = favorites.filter(i => i.id !== recipe.id);
 		}
+
+		await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+		fetchFavorites(favorites);
 	};
 
 	// Laad meer recepten wanneer de gebruiker scrolt
@@ -126,22 +129,24 @@ export default function RecipesPage({ navigation }) {
 	};
 
 	// Render elke recept
-	const RenderRecipe = ({ recipe }) =>{
+	const RenderRecipe = ({ recipe, favorites }) => {
 		let id = recipe.id;
 		return (
-		<View style={[styles.sectionGreen, { marginBottom: 10 }]}>
-			<TouchableOpacity onPress={() => navigation.navigate('RecipePage', { id })}>
-				<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
-				{recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
-			</TouchableOpacity>
-			<TouchableOpacity
-				style={[styles.buttonRed, recipes.favButton]}
-				onPress={() => addToFavorites(recipe)}
-			>
-				<Text style={[styles.redButtonText, recipes.favButtonText]}>Add to Favorites</Text>
-			</TouchableOpacity>
-		</View>
-	)};
+			<View style={[styles.sectionGreen, { marginBottom: 10 }]}>
+				<TouchableOpacity onPress={() => navigation.navigate('RecipePage', { id })}>
+					<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20 }]}>{recipe.title}</Text>
+					{recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={recipes.favButton}
+					onPress={() => toggleFavorite(recipe)}
+				>
+					<Icon name={favorites.some(i => i.id === recipe.id) ? 'star' : 'star-border'} size={50} color="#E26D5C" />
+				</TouchableOpacity>
+			</View>
+		)
+	};
 
 	if (loading && page == 1) {
 		return <View>
@@ -155,7 +160,7 @@ export default function RecipesPage({ navigation }) {
 			<FlatList
 				style={{ width: "100%" }}
 				data={data}
-				renderItem={({ item }) => <RenderRecipe recipe={item} />}
+				renderItem={({ item }) => <RenderRecipe recipe={item} favorites={favorites}/>}
 				keyExtractor={(item) => item.id.toString()}
 				onEndReached={!filters.query && !filters.diet && !filters.cuisine && filters.ingredients.length < 1 ? null : loadMoreRecipes}
 				onEndReachedThreshold={0.5}
@@ -184,13 +189,12 @@ const recipes = StyleSheet.create({
 		height: 100,
 	},
 	favButton: {
-		paddingVertical: 10,
+		height: 50,
+		width: 50,
 		marginTop: 10,
 		borderRadius: 7
 	},
-	favButtonText: {
-		fontSize: 16,
-	},
+
 	button: {
 		width: "100%",
 		paddingVertical: 10
