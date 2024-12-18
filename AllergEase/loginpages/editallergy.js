@@ -7,11 +7,6 @@ import allergyList from '../allergies';
 import styles from "../style";
 
 export default function EditAllergiesPage({ navigation }) {
-  const allergiesList = [
-    'Gluten', 'Lupine', 'Selderij', 'Ei', 'Vis',
-    'Pinda', 'Soja', 'Lactose', 'Schaaldieren',
-    'Mosterd', 'Sesamzaad', 'Sulfiet', 'Weekdieren', 'Noten',
-  ];
   const [selectedAllergies, setSelectedAllergies] = useState([]);
 
   useEffect(() => {
