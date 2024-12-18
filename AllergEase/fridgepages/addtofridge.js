@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, ScrollView, View, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
 import { Camera } from 'expo-camera'; 
 import { CameraView } from 'expo-camera';
@@ -9,6 +9,7 @@ const AddToFridgePage = ({ route }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const { addToFridge } = route.params;
+  const cooldownRef = useRef(false);
 
   // Request camera permissions
   useEffect(() => {
@@ -25,11 +26,23 @@ const AddToFridgePage = ({ route }) => {
 
   // Handle barcode scanning
   const handleBarCodeScanned = ({ type, data }) => {
-    setIsScanning(false);
-    Alert.alert("Barcode Scanned", `Type: ${type}\nData: ${data}`, [
-      { text: "OK" },
-    ]);
+    // Prevent duplicate scans during cooldown
+    if (cooldownRef.current) {
+      console.log("Cooldown active or duplicate scan");
+      return;
+    }
+
+    // Activate cooldown
+    cooldownRef.current = true;
+
+    // Log and process the barcode
+    console.log("Processing barcode:", data);
     fetchProductInfo(data);
+
+    // Deactivate cooldown after 5 seconds
+    setTimeout(() => {
+      cooldownRef.current = false;
+    }, 5000);
   };
 
   // Fetch product information from the Open Food Facts API using barcode
