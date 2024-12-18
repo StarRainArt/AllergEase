@@ -13,6 +13,7 @@ import RecipePage from './recipes/recipe';
 import ProfilePage from './loginpages/profiel';
 import EditAllergiesPage from './loginpages/editallergy';
 import EditUserInfoPage from './loginpages/edituser';
+import FavoriteRecipesScreen from './pages/favoriet';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -100,6 +101,10 @@ export default function App() {
         {/* Pages accessed from Profile */}
         <Stack.Screen name="EditAllergies" component={EditAllergiesPage} />
         {/* <Stack.Screen name="EditUserInfo" component={EditUserInfoPage} />    */}
+
+        {/* Pages Accessed from Recipes */}
+        <Stack.Screen name="FilterRecipes" component={FilterRecipes}/>
+        <Stack.Screen name="FavoriteRecipes" component={FavoriteRecipesScreen} />
 
         {/* Main App (Bottom Tabs) */}
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />

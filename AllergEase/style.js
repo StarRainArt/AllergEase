@@ -3,7 +3,8 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     background: {
-      padding: 30,
+      paddingHorizontal: 30,
+      paddingTop: 50,
       flex: 1,
       alignItems: 'center',
       backgroundColor: "#FFF5E1",
@@ -15,39 +16,42 @@ const styles = StyleSheet.create({
       color: "#472D30",
       paddingVertical: 20
     },
+    kopje: {
+      fontSize: 25,
+      fontFamily: "DynaPuff",
+      color: "#472D30",
+    },
     sectionGreen: {
       backgroundColor: "#C9CBA3",
       color: "#472D30",
       borderRadius: 15,
-      padding: 5
+      paddingVertical: 15,
+      paddingHorizontal: 20
     },
     sectionYellow: {
       backgroundColor: "#FFE1A8",
       color: "#472D30",
       borderRadius: 15,
-      padding: 5
+      paddingVertical: 15,
+      paddingHorizontal: 20
     },
     buttonRed: {
       backgroundColor: "#E26D5C",
-      width: "60%",
       borderRadius: 15,
       paddingVertical: 5
     },
     buttonGreen: {
       backgroundColor: "#C9CBA3",
-      width: "60%",
       borderRadius: 15,
       paddingVertical: 5
     },
     greenButtonText: {
       color: "#472D30",
-      fontSize: 25,
       fontFamily: "DynaPuff",
       textAlign: "center",
     },
     redButtonText: {
       color: "#FFF5E1",
-      fontSize: 25,
       fontFamily: "DynaPuff",
       textAlign: "center",
     },
@@ -58,12 +62,12 @@ const styles = StyleSheet.create({
       paddingTop: 5,
       paddingBottom: 0,
       width: "95%",
+      height: 50,
       borderRadius: 15,
       marginBottom: 20,
-      fontSize: 25,
       fontFamily: "BalooPaaji2",
       textAlignVertical: "bottom"
-    }
+    },
 });
 
 export default styles;

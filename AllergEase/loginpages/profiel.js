@@ -27,12 +27,12 @@ export default function ProfilePage({ navigation }) {
   
   return (
     <View style={styles.background}>
-      <Text style={styles.title}>profiel </Text>
+      <Text style={styles.title}>My Profile</Text>
       {user && (
         <>
           <View style={[styles.sectionGreen, {marginBottom: 30}]}>
             <View style={[profiel.inARow, {paddingBottom: 5}]}>
-              <Text style={styles.kopje}>Persoonlijk</Text>
+              <Text style={styles.kopje}>Personal</Text>
               <Pressable style={[styles.buttonRed, {width: "25%"}]} onPress={() => navigation.navigate('EditUserInfo')}><Text style={[styles.redButtonText, {fontSize: 20}]}>Edit</Text></Pressable>
             </View>
             <View>
@@ -46,7 +46,7 @@ export default function ProfilePage({ navigation }) {
           </View>
           <View style={styles.sectionYellow}>
             <View style={profiel.inARow}>
-              <Text style={styles.kopje}>Allergieën</Text>
+              <Text style={styles.kopje}>Allergens</Text>
               <Pressable style={[styles.buttonRed, {width: "25%"}]} onPress={() => navigation.navigate('EditAllergies')}><Text style={[styles.redButtonText, {fontSize: 20}]}>Edit</Text></Pressable>
             </View>
             {user.allergies && user.allergies.length > 0 ? (
@@ -74,7 +74,7 @@ const profiel = StyleSheet.create({
   },
   centerText: {
     fontFamily: "BalooPaaji2",
-    fontSize: 20,
+    fontSize: 25,
     textAlign: "center",
     color: "#472D30",
   },

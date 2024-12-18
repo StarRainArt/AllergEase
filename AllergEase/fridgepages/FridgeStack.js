@@ -7,7 +7,7 @@ const Stack = createStackNavigator();
 
 const FridgeStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen 
         name="Fridge" 
         component={FridgePage} 

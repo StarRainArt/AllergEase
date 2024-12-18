@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, ScrollView, View, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
 import { Camera } from 'expo-camera'; 
 import { CameraView } from 'expo-camera';
+import styles from "../style";
 
 const AddToFridgePage = ({ route }) => {
   const [ingredientName, setIngredientName] = useState('');
   const [hasPermission, setHasPermission] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const { addToFridge } = route.params;
+  const cooldownRef = useRef(false);
 
   // Request camera permissions
   useEffect(() => {
@@ -24,11 +26,23 @@ const AddToFridgePage = ({ route }) => {
 
   // Handle barcode scanning
   const handleBarCodeScanned = ({ type, data }) => {
-    setIsScanning(false);
-    Alert.alert("Barcode Scanned", `Type: ${type}\nData: ${data}`, [
-      { text: "OK" },
-    ]);
+    // Prevent duplicate scans during cooldown
+    if (cooldownRef.current) {
+      console.log("Cooldown active or duplicate scan");
+      return;
+    }
+
+    // Activate cooldown
+    cooldownRef.current = true;
+
+    // Log and process the barcode
+    console.log("Processing barcode:", data);
     fetchProductInfo(data);
+
+    // Deactivate cooldown after 5 seconds
+    setTimeout(() => {
+      cooldownRef.current = false;
+    }, 5000);
   };
 
   // Fetch product information from the Open Food Facts API using barcode
@@ -113,91 +127,75 @@ const AddToFridgePage = ({ route }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.title}>Scan Barcode or Add Manually</Text>
-
+    <ScrollView contentContainerStyle={styles.background}>
+      <Text style={styles.title}>My Fridge</Text>
+      <View style={fridge.section}>
+        <Text style={styles.kopje}>Scan Barcode:</Text>
         <Pressable
-          style={styles.button}
+          style={[styles.buttonRed, fridge.button]}
           onPress={() => {
             setIsScanning(true);
           }}
         >
-          <Text style={styles.buttonText}>Scan Barcode</Text>
+          <Text style={[styles.redButtonText, fridge.buttonText]}>Scan Barcode</Text>
         </Pressable>
       </View>
 
       {isScanning && (
         <CameraView
-          style={styles.camera}
+          style={fridge.camera}
           onBarcodeScanned={handleBarCodeScanned}
           flash="auto"
           facing="back"
         />
       )}
 
-      <View style={styles.section}>
-        <Text style={styles.title}>Add Ingredient Manually:</Text>
-        <Text>Ingredient Name or Barcode:</Text>
+      <View style={fridge.section}>
+        <Text style={styles.kopje}>Add Ingredient Manually:</Text>
+        <Text style={fridge.text}>Ingredient Name or Barcode:</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, fridge.input]}
           placeholder="E.g., Tomatoes or product barcode"
           value={ingredientName}
           onChangeText={setIngredientName}
         />
 
-        <Pressable style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Add Ingredient</Text>
+        <Pressable style={[styles.buttonRed, fridge.button]} onPress={handleSubmit}>
+          <Text style={[styles.redButtonText, fridge.buttonText]}>Add Ingredient</Text>
         </Pressable>
       </View>
     </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    paddingTop: 40,
-    paddingHorizontal: 20,
-  },
+const fridge = StyleSheet.create({
   section: {
     marginBottom: 30,
     width: '100%',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
   input: {
     height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
+    fontSize: 20,
+    fontFamily: "BalooPaaji2",
     marginBottom: 20,
     width: '100%',
   },
   button: {
-    backgroundColor: '#007BFF',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 15,
     marginBottom: 10,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
   },
   camera: {
     width: '100%',
     height: 300,
-    marginVertical: 20,
+    marginBottom: 20,
   },
+  text: {
+    fontSize: 20,
+    fontFamily: "BalooPaaji2",
+  }
 });
 
 export default AddToFridgePage;

@@ -31,10 +31,10 @@ export default function LoginPage({ navigation }) {
 
   return (
     <View style={styles.background}>
-      <Text style={login.logo}>Allerg<Text style={{color: "#E26D5C"}}>Ease</Text></Text>
-      <Text style={login.quote}>Manage your Allergies with <Text style={{color: "#E26D5C"}}>Ease</Text></Text>
-      <TextInput placeholder="Email" onChangeText={setEmail} value={email} style={styles.input}/>
-      <TextInput placeholder="Password" secureTextEntry onChangeText={setPassword} value={password} style={styles.input}/>
+      <Text style={[login.logo, {width: "95%"}]}>Allerg<Text style={{color: "#E26D5C"}}>Ease</Text></Text>
+      <Text style={[login.quote, {width: "85%"}]}>Manage your Allergies with <Text style={{color: "#E26D5C"}}>Ease</Text></Text>
+      <TextInput placeholder="Email" onChangeText={setEmail} value={email} style={[styles.input, {fontSize: 25}]}/>
+      <TextInput placeholder="Password" secureTextEntry onChangeText={setPassword} value={password} style={[styles.input, {fontSize: 25}]}/>
       <Pressable onPress={handleLogin} style={[styles.buttonGreen, {width: "60%"}]}>
         <Text style={[styles.greenButtonText, {fontSize: 25}]}>Log In</Text>
       </Pressable>
@@ -45,7 +45,7 @@ export default function LoginPage({ navigation }) {
           </View>
           <View style={{flex: 0.8, height: 4, backgroundColor: '#472D30'}} />
       </View>
-      <View style={{flexDirection: "row", alignItems: 'center'}}>
+      <View style={{flexDirection: "row", justifyContent: "center", minHeight: 100}}>
         <Text style={login.registerText}>Create a </Text>
         <Pressable onPress={() => navigation.navigate('Register')}><Text style={login.registerLink}>New Account</Text></Pressable>
       </View>
@@ -57,13 +57,13 @@ const login = StyleSheet.create({
   registerText: {
     fontFamily: "DynaPuff",
     color: "#472D30",
-    fontSize: 25
+    fontSize: 25,
   },
   registerLink: {
     fontFamily: "DynaPuff",
     color: "#E26D5C",
     textDecorationLine: "underline",
-    fontSize: 25
+    fontSize: 25,
   },
   logo: {
     textAlign: "center",
@@ -71,7 +71,8 @@ const login = StyleSheet.create({
     fontFamily: "Chewy",
     color: "#472D30",
     marginBottom: 0,
-    includeFontPadding: false
+    includeFontPadding: false,
+    minHeight: 100
   },
   quote: {
     textAlign: "center",
@@ -79,5 +80,6 @@ const login = StyleSheet.create({
     fontFamily: "DynaPuff",
     color: "#472D30",
     marginBottom: 30,
+    minHeight: 100
   },
 });

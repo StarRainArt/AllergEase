@@ -43,26 +43,26 @@ export default function RegisterPage({ navigation }) {
         <View></View>
       </View>
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 25}]}
         placeholder="Username"
         onChangeText={setUsername}
         value={username}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 25}]}
         placeholder="Email"
         onChangeText={setEmail}
         value={email}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 25}]}
         placeholder="Password"
         secureTextEntry
         onChangeText={setPassword}
         value={password}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, {fontSize: 25}]}
         placeholder="Confirm Password"
         secureTextEntry
         onChangeText={setConfirmPassword}
