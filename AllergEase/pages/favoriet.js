@@ -46,35 +46,37 @@ const FavoriteRecipesScreen = ({ navigation }) => {
 	}, []);
 
 	// Render elke favoriet
-	const RenderFavorite = ({ recipe }) => (
-		<View style={favs.recipeContainer}>
+	const RenderFavorite = ({ recipe }) => {
+		let id = recipe.id;
+		return (
+		<TouchableOpacity onPress={() => navigation.navigate('RecipePage', { id })} style={favs.recipeContainer}>
 			<Text style={favs.recipeTitle}>{recipe.title}</Text>
 			<TouchableOpacity onPress={() => removeFavorite(recipe.id)}>
-			<Icon name='star' color="#E26D5C" size={50}/>
-		</TouchableOpacity>
-		</View >
-	);
+				<Icon name='star' color="#E26D5C" size={50} />
+			</TouchableOpacity>
+		</TouchableOpacity >
+	)};
 
-return (
-	<View style={styles.background}>
-		<View style={favs.inARow}>
-			<Pressable onPress={() => navigation.goBack()}><Text style={styles.title}>{'<'}</Text></Pressable>
-			<Text style={styles.title}>Recipes</Text>
-			<View></View>
+	return (
+		<View style={styles.background}>
+			<View style={favs.inARow}>
+				<Pressable onPress={() => navigation.goBack()}><Text style={styles.title}>{'<'}</Text></Pressable>
+				<Text style={styles.title}>Recipes</Text>
+				<View></View>
+			</View>
+			<Text style={[styles.kopje, { marginBottom: 10 }]}>Favorites</Text>
+			{favorites.length > 0 ? (
+				<FlatList
+					style={{ width: "100%" }}
+					data={favorites}
+					renderItem={({ item }) => <RenderFavorite recipe={item} />}
+					keyExtractor={(item) => item.id.toString()}
+				/>
+			) : (
+				<Text style={favs.text}>You don't have any favorite recipes yet.</Text>
+			)}
 		</View>
-		<Text style={[styles.kopje, { marginBottom: 10 }]}>Favorites</Text>
-		{favorites.length > 0 ? (
-			<FlatList
-				style={{ width: "100%" }}
-				data={favorites}
-				renderItem={({ item }) => <RenderFavorite recipe={item} />}
-				keyExtractor={(item) => item.id.toString()}
-			/>
-		) : (
-			<Text style={favs.text}>You don't have any favorite recipes yet.</Text>
-		)}
-	</View>
-);
+	);
 };
 
 // Stijlen voor de favorietenpagina

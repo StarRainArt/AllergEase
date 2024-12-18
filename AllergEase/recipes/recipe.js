@@ -14,12 +14,29 @@ export default function RecipePage({ navigation, route }) {
     const [loading, setLoading] = useState(true);
     const [allergies, setAllergies] = useState([]);
     const [favorites, setFavorites] = useState([]);
+    const [items, setItems] = useState([]);
+    const [itemsAdded, setItemsAdded] = useState(false);
     const [fontsLoaded] = useFonts({
         "Chewy": require("../assets/fonts/Chewy-Regular.ttf"),
         "DynaPuff": require("../assets/fonts/DynaPuff-Regular.ttf"),
         "DynaPuffMedium": require("../assets/fonts/DynaPuff-Medium.ttf"),
         "BalooPaaji2": require("../assets/fonts/BalooPaaji2-VariableFont_wght.ttf"),
     });
+
+    const fetchItems = async () => {
+        const storedItems = await AsyncStorage.getItem('shoppingList');
+        if (storedItems) {
+            setItems(JSON.parse(storedItems));
+        }
+    };
+
+    const addItems = async (addItems = []) => {
+        addItems = addItems.map(i => ({ id: i.id, name: i.nameClean, bought: false }));
+        let newitems = addItems.filter(i => !items.some(j => j.id === i.id));
+        setItems([...items, ...newitems]);
+        setItemsAdded(true);
+        await AsyncStorage.setItem('shoppingList', JSON.stringify([...items, ...newitems]));
+    };
 
     const fetchFavorites = async () => {
         const favoritesData = await AsyncStorage.getItem('favorites');
@@ -29,23 +46,26 @@ export default function RecipePage({ navigation, route }) {
     };
 
     const toggleFavorite = async (recipe) => {
-		const favoritesData = await AsyncStorage.getItem('favorites');
-		let favorites = favoritesData ? JSON.parse(favoritesData) : [];
+        fetchFavorites();
+        checkItems(recipe);
+        if (!itemsAdded) {
+           
+        if (!favorites.some(i => i.id === recipe.id)) {
+            favorites.push(recipe);
+        } else {
+            favorites = favorites.filter(i => i.id !== recipe.id);
+        }
+        }
 
-		if (!favorites.some(i => i.id === recipe.id)) {
-			favorites.push(recipe);
-		} else {
-			favorites = favorites.filter(i => i.id !== recipe.id);
-		}
 
-		await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
-		fetchFavorites(favorites);
-	};
+        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+        fetchFavorites(favorites);
+    };
 
     const fetchUser = async () => {
         const userData = await AsyncStorage.getItem('user');
         const user = JSON.parse(userData);
-        
+
         setAllergies(user.allergies);
     };
     const getRecipe = async (id) => {
@@ -79,13 +99,22 @@ export default function RecipePage({ navigation, route }) {
             );
         });
     }
+    const checkItems =  async (recipe) => { 
+        if (items.some(i => !recipe.extendedIngredients.some(j => j.id === i.id))) {
+            setItemsAdded(false);
+        } else {
+            setItemsAdded(true);
+        }
+    }
     useFocusEffect(
         useCallback(() => {
+            fetchItems();
             fetchUser();
             fetchFavorites();
             getRecipe(id);
-    }, [id])
-);
+            checkItems(recipe);
+        }, [id])
+    );
 
     if (!fontsLoaded || loading) {
         return <Text style={[styles.background, recipeStyle.recipe]}>Loading...</Text>;
@@ -93,47 +122,58 @@ export default function RecipePage({ navigation, route }) {
     return (
         <View style={styles.background}>
             <View style={recipeStyle.inARow}>
-            <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.title}>{'<'}</Text></TouchableOpacity>
-            <Text style={styles.title}>Recipes</Text>
-            <View/>
+                <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.title}>{'<'}</Text></TouchableOpacity>
+                <Text style={styles.title}>Recipes</Text>
+                <View />
             </View>
-            <ScrollView style={[styles.sectionGreen, {marginBottom: 10}]} >
-            <View style={recipeStyle.inARow}>
-            <TouchableOpacity onPress={() => toggleFavorite(recipe)}><Icon name={favorites.some(i => i.id === recipe.id) ? 'star' : 'star-border'} size={60} color="#E26D5C"/></TouchableOpacity>
-            <Text style={[recipeStyle.title]}>{recipe.title}</Text>
-            </View>
-            <Image source={{ uri: recipe.image }} style={recipeStyle.image} />
-     
-            <Text style={[styles.title, recipeStyle.subtitle]}>Ingredients</Text>
-            <View style={recipeStyle.paragraphContainer}>
-                {ingredientsList()}
-            </View>
-            <Text style={[styles.title, recipeStyle.subtitle]}>Instructions</Text>
-            {recipe.analyzedInstructions.length > 0 ? (
-            <View style={recipeStyle.paragraphContainer}>
-                {instructionsList()}
-            </View>) : (
-            <Text style={recipeStyle.paragraph}>{recipe.instructions}</Text>
-               )}
+            <ScrollView style={[styles.sectionGreen, { marginBottom: 10 }]} >
+                <View style={recipeStyle.inARow}>
+                    <View />
+                    <TouchableOpacity onPress={() => toggleFavorite(recipe)}><Icon name={favorites.some(i => i.id === recipe.id) ? 'star' : 'star-border'} size={60} color="#E26D5C" /></TouchableOpacity>
+                    <Text style={[recipeStyle.title]}>{recipe.title}</Text>
+                </View>
+                <Image source={{ uri: recipe.image }} style={recipeStyle.image} />
+                <View style={recipeStyle.inARow}>
+                    <View/>
+                    <Text style={[styles.title, recipeStyle.subtitle]}>Ingredients</Text>
+                       
+                    <TouchableOpacity style={recipeStyle.icon} onPress={() => addItems(recipe.extendedIngredients)}>
+                        <Icon name={itemsAdded ? 'shopping-cart' : 'add-shopping-cart'} size={50} color="#FFF5E1" />
+                    </TouchableOpacity>
+                       
+
+                
+                </View>
+
+                <View style={recipeStyle.paragraphContainer}>
+                    {ingredientsList()}
+                </View>
+                <Text style={[styles.title, recipeStyle.subtitle]}>Instructions</Text>
+                {recipe.analyzedInstructions.length > 0 ? (
+                    <View style={recipeStyle.paragraphContainer}>
+                        {instructionsList()}
+                    </View>) : (
+                    <Text style={recipeStyle.paragraph}>{recipe.instructions}</Text>
+                )}
             </ScrollView>
         </View>
     );
 }
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const recipeStyle = StyleSheet.create({
     image: {
-		width: width*0.7,
-		alignSelf: 'center',
-		height: 150,
+        width: width * 0.7,
+        alignSelf: 'center',
+        height: 150,
         borderRadius: 15,
-	},
+    },
     inARow: {
         flexDirection: "row",
         alignItems: 'center',
         justifyContent: "space-between",
-        width: "100%"
+        width: width * 0.65
     },
     paragraph: {
         fontSize: 18,
@@ -141,6 +181,12 @@ const recipeStyle = StyleSheet.create({
         color: "#FFF5E1",
         fontWeight: "bold",
         paddingBottom: 5
+    },
+    icon: {
+        backgroundColor: '#E26D5C',
+        borderRadius: 17,
+        margin: 2,
+        padding: 5,
     },
     title: {
         fontSize: 23,
@@ -150,6 +196,7 @@ const recipeStyle = StyleSheet.create({
     },
     subtitle: {
         fontSize: 22,
+        textAlign: "center",
         color: "#FFF5E1",
         paddingVertical: 3
     },

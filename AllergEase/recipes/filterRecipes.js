@@ -62,7 +62,7 @@ export default function FilterRecipes({ route, navigation }) {
                 step={5}
                 value={maxReadyTime}
                 onSlidingComplete={handleSilderChange}
-               />
+            />
             <Picker
                 style={[styles.input, filter.input]}
                 selectedValue={diet}
@@ -84,17 +84,19 @@ export default function FilterRecipes({ route, navigation }) {
                 ))}
             </Picker>
             <View style={{width: "100%"}}>
-
+                <View style={filter.inARow}>
                 <TextInput
-                    style={[styles.input, filter.input]}
+                    style={[styles.input, filter.input, {flex: 4}]}
                     placeholder="Add ingredient"
                     value={ingredient}
                     onChangeText={setIngredient}
                 />
-                <Pressable style={[styles.buttonGreen, filter.button]} onPress={handleAddIngredient}>
-                    <Text style={[styles.greenButtonText, filter.buttonText]}>Add</Text>
+                <View style={{flex:1}} />
+                <Pressable style={[styles.buttonGreen, filter.button, {flex:3}]} onPress={handleAddIngredient}>
+                    <Text style={[styles.greenButtonText, filter.buttonText,{paddingTop: 7, paddingBottom: 7}]}>Add</Text>
                 </Pressable>
-                <FlatList
+                </View>
+                 <FlatList
                     data={ingredients}
                     renderItem={({ item, index }) => (
                         <View>
