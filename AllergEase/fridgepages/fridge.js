@@ -7,28 +7,28 @@ const FridgePage = ({ navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
 
 
-  const fetchFridgeItems = async () => {
-    try {
+  useEffect(() => {
+    const fetchFridgeItems = async () => {
       const storedItems = await AsyncStorage.getItem('fridgeItems');
       if (storedItems) {
         setFridgeItems(JSON.parse(storedItems));
-      } else {
-        setFridgeItems([]);
       }
-    } catch (error) {
-      console.error('Fout bij ophalen van fridgeItems:', error);
+    };
+  
+    const unsubscribe = navigation.addListener('focus', fetchFridgeItems);
+    return unsubscribe;
+  }, [navigation]);
+
+  // Save fridge items to AsyncStorage whenever the list changes
+  useEffect(() => {
+    const saveFridgeItems = async () => {
+      await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
+    };
+
+    if (fridgeItems.length > 0) {
+      saveFridgeItems();
     }
-  };
-
-  useEffect(() => {
-    fetchFridgeItems();
-  }, []);
-
- 
-  useEffect(() => {
-    const interval = setInterval(fetchFridgeItems, 500);
-    return () => clearInterval(interval); 
-  }, []);
+  }, [fridgeItems]);
 
   
   const removeItem = async (index) => {

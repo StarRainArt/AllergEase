@@ -39,22 +39,22 @@ const ShoppingListScreen = () => {
       item.id === id ? { ...item, bought: !item.bought } : item
     );
     setItems(updatedItems);
-
-    // Verplaats naar fridge als gekocht
+  
+    // Check if the item is marked as bought
     const boughtItem = updatedItems.find((item) => item.id === id && item.bought);
     if (boughtItem) {
       try {
+        // Add the bought item to the fridge in AsyncStorage
         const storedFridgeItems = await AsyncStorage.getItem('fridgeItems');
         const fridgeItems = storedFridgeItems ? JSON.parse(storedFridgeItems) : [];
         fridgeItems.push({ name: boughtItem.name });
-
-        // Opslaan in AsyncStorage
+  
         await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
-
-        // Verwijder uit boodschappenlijst
+  
+        // Remove from shopping list
         setItems(updatedItems.filter((item) => item.id !== id));
       } catch (error) {
-        console.error('Fout bij verplaatsen naar fridge:', error);
+        console.error('Error moving item to fridge:', error);
       }
     }
   };
