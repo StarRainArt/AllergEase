@@ -1,13 +1,20 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Pressable, StyleSheet } from "react-native";
+import { Picker } from '@react-native-picker/picker';
+import Slider from '@react-native-community/slider';
+import { allergyList } from "../allergies";
+import { dietList } from "../diets";
+import { cuisineList } from "../cuisines";
 import styles from "../style";
 
-export default function FilterRecipes({ onFilter, navigation }) {
+export default function FilterRecipes({ route, navigation }) {
+    const { onFilter } = route.params;
     const [query, setQuery] = useState("");
     const [ingredient, setIngredient] = useState("");
     const [ingredients, setIngredients] = useState([]);
     const [diet, setDiet] = useState("");
     const [cuisine, setCuisine] = useState("");
+    const [maxReadyTime, setMaxReadyTime] = useState(0);
 
     const handleAddIngredient = () => {
         if (ingredient.trim()) {
@@ -16,12 +23,20 @@ export default function FilterRecipes({ onFilter, navigation }) {
         }
     };
 
+    const handleSilderChange = (value) => {
+        setMaxReadyTime(value);
+    };
+
     const handleRemoveIngredient = (index) => {
         setIngredients(ingredients.filter((_, i) => i !== index));
     };
+
     const handleFilter = () => {
-        onFilter({ query, ingredients, diet, cuisine });
+        const filters = { query, diet, cuisine, ingredients, maxReadyTime };
+        onFilter(filters);
+        navigation.goBack();
     };
+
 
     return (
         <View style={styles.background}>
@@ -37,19 +52,33 @@ export default function FilterRecipes({ onFilter, navigation }) {
                 value={query}
                 onChangeText={setQuery}
             />
-            <TextInput
-                style={[styles.input, filter.input]}
-                placeholder="Diet"
-                value={diet}
-                onChangeText={setDiet}
-            />
-            <TextInput
-                style={[styles.input, filter.input]}
-                placeholder="Cuisine"
-                value={cuisine}
-                onChangeText={setCuisine}
-            />
+            <Slider
+                minimumValue={0}
+                maximumValue={120}
+                step={5}
+                value={maxReadyTime}
+                onValueChange={handleSilderChange}
+               />
+            <Picker
+                selectedValue={diet}
+                onValueChange={(itemValue) => setDiet(itemValue)}
+            >
+                <Picker.Item label="Select diet" value="" />
+                {dietList.map((diet) => (
+                    <Picker.Item key={diet} value={diet} label={diet} />
+                ))}
+            </Picker>
+            <Picker
+                selectedValue={cuisine}
+                onValueChange={(itemValue) => setCuisine(itemValue)}
+            >
+                <Picker.Item label="Select cuisine" value="" />
+                {cuisineList.map((cuisine) => (
+                    <Picker.Item key={cuisine} value={cuisine} label={cuisine} />
+                ))}
+            </Picker>
             <View style={{width: "100%"}}>
+
                 <TextInput
                     style={[styles.input, filter.input]}
                     placeholder="Add ingredient"
@@ -65,7 +94,7 @@ export default function FilterRecipes({ onFilter, navigation }) {
                         <View>
                             <Text>{item}</Text>
                             <TouchableOpacity onPress={() => handleRemoveIngredient(index)}>
-                                <Text style={filterStyles.removeButton}>Remove</Text>
+                                <Text>Remove</Text>
                             </TouchableOpacity>
                         </View>
                     )}
