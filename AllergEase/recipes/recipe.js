@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, Share } from "react-native";
 import { useFonts } from "expo-font";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -60,6 +60,28 @@ export default function RecipePage({ navigation, route }) {
 
         await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
         fetchFavorites(favorites);
+    };
+
+    const onShare = async () => {
+        try {
+          const result = await Share.share({
+            message: `Check out this recipe for ${recipe.title} I made with the help of AllergEase!`,
+            title: `AllergEase - ${recipe.title}`,
+            // url: ""
+          });
+     
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              console.log('Shared with activity type:', result.activityType);
+            } else {
+              console.log('Shared successfully');
+            }
+          } else if (result.action === Share.dismissedAction) {
+            console.log('Share dismissed');
+          }
+        } catch (error) {
+          console.error('Error sharing:', error);
+        }
     };
 
     const fetchUser = async () => {
@@ -135,9 +157,12 @@ export default function RecipePage({ navigation, route }) {
                 <Image source={{ uri: recipe.image }} style={recipeStyle.image} />
                 <View style={[recipeStyle.inARow, {width: "100%"}]}>
                     <View/>
-                    <Text style={[recipeStyle.subtitle]}>Ingredients</Text>                       
+                    <Text style={[recipeStyle.subtitle]}>Ingredients</Text>
+                    <TouchableOpacity style={recipeStyle.icon} onPress={onShare}>
+                        <Icon name={"share"} size={40} color="#FFF5E1" />
+                    </TouchableOpacity>                     
                     <TouchableOpacity style={recipeStyle.icon} onPress={() => addItems(recipe.extendedIngredients)}>
-                        <Icon name={itemsAdded ? 'shopping-cart' : 'add-shopping-cart'} size={50} color="#FFF5E1" />
+                        <Icon name={itemsAdded ? 'shopping-cart' : 'add-shopping-cart'} size={40} color="#FFF5E1" />
                     </TouchableOpacity>
                 </View>
 
@@ -164,6 +189,7 @@ const recipeStyle = StyleSheet.create({
         alignSelf: 'center',
         height: 150,
         borderRadius: 15,
+        marginBottom: 10
     },
     inARow: {
         flexDirection: "row",
