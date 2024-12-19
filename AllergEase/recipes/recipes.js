@@ -142,7 +142,7 @@ export default function RecipesPage({ navigation }) {
 					<Icon name={favorites.some(i => i.id === recipe.id) ? 'star' : 'star-border'} size={50} color="#E26D5C" />
 				</TouchableOpacity>
 				
-					<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20, width: '80%'}]}>{recipe.title}</Text>
+				<Text style={[styles.kopje, { paddingVertical: 10, fontSize: 20, width: '80%', textAlign: "center"}]}>{recipe.title}</Text>
 					{recipe.image && <Image source={{ uri: recipe.image }} style={recipes.image} />}
 			</TouchableOpacity>
 		)
@@ -168,7 +168,7 @@ export default function RecipesPage({ navigation }) {
 			/>
 
 			<View style={recipes.recipesnav}>
-				<Pressable style={[styles.buttonRed, recipes.button, {flexDirection: "row"}]} title="Filter" onPress={() => navigation.navigate('FilterRecipes', { onFilter })}>
+				<Pressable style={[styles.buttonRed, recipes.button, {flexDirection: "row", paddingLeft: 10}]} title="Filter" onPress={() => navigation.navigate('FilterRecipes', { onFilter })}>
 					<Icon style={{width: '40%'}} name="search" size={30} color="#FFF5E1" />
 					<Text style={[styles.redButtonText, {width: '40%'},recipes.buttonText]}>Filter</Text>
 				</Pressable>
