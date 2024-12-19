@@ -159,7 +159,7 @@ export default function RecipePage({ navigation, route }) {
                     <TouchableOpacity style={recipeStyle.icon} onPress={onShare}>
                         <Icon name={"share"} size={40} color="#FFF5E1" />
                     </TouchableOpacity>                     
-                    <TouchableOpacity style={recipeStyle.icon} onPress={() => addItems(recipe.extendedIngredients)} disabled={itemsAdded ? true :false}>
+                    <TouchableOpacity style={recipeStyle.icon} onPress={() => addItems(recipe.extendedIngredients)}>
                         <Icon name={itemsAdded ? 'shopping-cart' : 'add-shopping-cart'} size={40} color="#FFF5E1" />
                     </TouchableOpacity>
                 </View>
