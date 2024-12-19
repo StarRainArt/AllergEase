@@ -6,25 +6,25 @@ import styles from "../style";
 const FavoriteRecipesScreen = ({ navigation }) => {
 	const [favorites, setFavorites] = useState([]);
 
-	// Haal de favorieten op uit AsyncStorage
+
 	const fetchFavorites = async () => {
 		try {
 			const savedFavorites = await AsyncStorage.getItem('favorites');
 			if (savedFavorites) {
-				setFavorites(JSON.parse(savedFavorites));  // Zet de favorieten in de state
+				setFavorites(JSON.parse(savedFavorites));  
 			}
 		} catch (error) {
 			console.error("Failed to load favorites:", error);
 		}
 	};
 
-	// Function to remove an item from favorites
+	
 	const removeFavorite = async (id) => {
 		try {
-			// Filter out the item with the matching id
+			
 			const updatedFavorites = favorites.filter(item => item.id !== id);
 			
-			// Update the state and AsyncStorage
+		
 			setFavorites(updatedFavorites);
 			await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
 		} catch (error) {
@@ -33,10 +33,10 @@ const FavoriteRecipesScreen = ({ navigation }) => {
 	};
 
 	useEffect(() => {
-		fetchFavorites();  // Laad favorieten wanneer de pagina wordt geladen
+		fetchFavorites();  
 	}, []);
 
-	// Render elke favoriet
+
 	const RenderFavorite = ({ recipe }) => (
 		<View style={favs.recipeContainer}>
 			<Text style={favs.recipeTitle}>{recipe.title}</Text>
@@ -69,7 +69,7 @@ const FavoriteRecipesScreen = ({ navigation }) => {
 	);
 };
 
-// Stijlen voor de favorietenpagina
+
 const favs = StyleSheet.create({
 	inARow: {
         flexDirection: "row", 

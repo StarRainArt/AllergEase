@@ -8,7 +8,7 @@ const ShoppingListScreen = () => {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState('');
 
-  // Haal boodschappenlijst op bij het laden van de app
+  
   useEffect(() => {
     const fetchItems = async () => {
       const storedItems = await AsyncStorage.getItem('shoppingList');
@@ -19,7 +19,7 @@ const ShoppingListScreen = () => {
     fetchItems();
   }, []);
 
-  // Sla boodschappenlijst op bij elke wijziging
+  
   useEffect(() => {
     const saveItems = async () => {
       await AsyncStorage.setItem('shoppingList', JSON.stringify(items));
@@ -40,18 +40,18 @@ const ShoppingListScreen = () => {
     );
     setItems(updatedItems);
   
-    // Check if the item is marked as bought
+  
     const boughtItem = updatedItems.find((item) => item.id === id && item.bought);
     if (boughtItem) {
       try {
-        // Add the bought item to the fridge in AsyncStorage
+      
         const storedFridgeItems = await AsyncStorage.getItem('fridgeItems');
         const fridgeItems = storedFridgeItems ? JSON.parse(storedFridgeItems) : [];
         fridgeItems.push({ name: boughtItem.name });
   
         await AsyncStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
   
-        // Remove from shopping list
+      
         setItems(updatedItems.filter((item) => item.id !== id));
       } catch (error) {
         console.error('Error moving item to fridge:', error);
