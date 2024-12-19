@@ -47,19 +47,17 @@ export default function RecipePage({ navigation, route }) {
 
     const toggleFavorite = async (recipe) => {
         fetchFavorites();
-        checkItems(recipe);
-        if (!itemsAdded) {
-           
-        if (!favorites.some(i => i.id === recipe.id)) {
-            favorites.push(recipe);
+        let newFavorites = favorites;
+        if (!favorites.some(i => i.id == recipe.id)) {
+            newFavorites.push(recipe);
         } else {
-            favorites = favorites.filter(i => i.id !== recipe.id);
-        }
+            console.log('removing', recipe.id);
+           newFavorites = favorites.filter(i => i.id !== recipe.id);
         }
 
 
-        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
-        fetchFavorites(favorites);
+        await AsyncStorage.setItem('favorites', JSON.stringify(newFavorites));
+        fetchFavorites();
     };
 
     const fetchUser = async () => {
