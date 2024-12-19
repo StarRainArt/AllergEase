@@ -121,10 +121,10 @@ export default function RecipePage({ navigation, route }) {
     }
     return (
         <View style={styles.background}>
-            <View style={recipeStyle.inARow}>
+            <View style={[recipeStyle.inARow, {width: "100%"}]}>
                 <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.title}>{'<'}</Text></TouchableOpacity>
                 <Text style={styles.title}>Recipes</Text>
-                <View />
+                <View></View>
             </View>
             <ScrollView style={[styles.sectionGreen, { marginBottom: 10 }]} >
                 <View style={recipeStyle.inARow}>
@@ -133,16 +133,12 @@ export default function RecipePage({ navigation, route }) {
                     <Text style={[recipeStyle.title]}>{recipe.title}</Text>
                 </View>
                 <Image source={{ uri: recipe.image }} style={recipeStyle.image} />
-                <View style={recipeStyle.inARow}>
+                <View style={[recipeStyle.inARow, {width: "100%"}]}>
                     <View/>
-                    <Text style={[styles.title, recipeStyle.subtitle]}>Ingredients</Text>
-                       
+                    <Text style={[recipeStyle.subtitle]}>Ingredients</Text>                       
                     <TouchableOpacity style={recipeStyle.icon} onPress={() => addItems(recipe.extendedIngredients)}>
                         <Icon name={itemsAdded ? 'shopping-cart' : 'add-shopping-cart'} size={50} color="#FFF5E1" />
                     </TouchableOpacity>
-                       
-
-                
                 </View>
 
                 <View style={recipeStyle.paragraphContainer}>
@@ -178,7 +174,7 @@ const recipeStyle = StyleSheet.create({
     paragraph: {
         fontSize: 18,
         fontFamily: "BalooPaaji2",
-        color: "#FFF5E1",
+        color: "#472D30",
         fontWeight: "bold",
         paddingBottom: 5
     },
@@ -190,14 +186,14 @@ const recipeStyle = StyleSheet.create({
     },
     title: {
         fontSize: 23,
-        fontFamily: "DynaPuff",
+        fontFamily: "DynaPuffMedium",
         color: "#472D30",
         paddingVertical: 0
     },
     subtitle: {
         fontSize: 22,
-        textAlign: "center",
-        color: "#FFF5E1",
-        paddingVertical: 3
+        color: "#472D30",
+        paddingVertical: 3,
+        fontFamily: "DynaPuff",
     },
 });
