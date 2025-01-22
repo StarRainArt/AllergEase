@@ -159,6 +159,7 @@ const AddToFridgePage = ({ route }) => {
           value={ingredientName}
           onChangeText={setIngredientName}
         />
+        <Text style={fridge.warning}>Het is op het moment alleen mogelijk om ingrediënten in het nederlands toe te voegen, excuus voor het ongemak</Text>
 
         <Pressable style={[styles.buttonRed, fridge.button]} onPress={handleSubmit}>
           <Text style={[styles.redButtonText, fridge.buttonText]}>Add Ingredient</Text>
@@ -195,6 +196,12 @@ const fridge = StyleSheet.create({
   text: {
     fontSize: 20,
     fontFamily: "BalooPaaji2",
+  },
+  warning: {
+    fontSize: 18,
+    fontFamily: "BalooPaaji2",
+    color: "#E26D5C",
+    marginBottom: 10
   }
 });
 
